@@ -5,12 +5,14 @@ require_relative 'results'
 class Commands
     def initialize
         @hash_comm = Hash.new
+        #@keys_stored = {}
     end
 
     ### -- Retrieval Commands -- ###
 
     def get(key)
-        result = Result.new(false,"Not value asocieted to the key:#{key}") #no es creada el Answer corregir (error pero secudnario, no requerido)
+        result = Result.new(false,"Not value associated to the key: #{key}") #no es creada el Answer corregir (error pero secudnario, no requerido)
+        remove_expired_keys()
         if (@hash_comm[key] != nil)
             data = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()}\r\n #{@hash_comm[key].msg()}\r\n END\r\n"
             result.data = data
@@ -26,9 +28,10 @@ class Commands
 
     def set(data)                           # FUNCIONA FALTA EXPECTIME
         data_in = noreply_correction(data)
+        remove_expired_keys()
         result = Result.new(false,"ERROR")
         if storage_validator(data_in)
-            to_store = Hash_t.new(data_in[2],data_in[3],data_in[4],data_in[5],data_in[6])
+            to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6])
             @hash_comm[data_in[1]] = to_store
             result.set_succ(true)
             result.set_data("STORED")
@@ -37,6 +40,7 @@ class Commands
     end
     def add(data)                           # FUNCIONA FALTA EXPECTIME
         data_in = noreply_correction(data)
+        remove_expired_keys()
         result = Result.new(false,"ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] == nil
@@ -54,6 +58,7 @@ class Commands
     #The append and prepend commands do not accept flags or exptime.They update existing data portions, and ignore new flag and exptime settings.
     def append(data)
         data_in = noreply_correction(data)
+        remove_expired_keys()
         result = Result.new(false,"CLIENT_ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil
@@ -68,6 +73,7 @@ class Commands
     end
     def prepend(data)
         data_in = noreply_correction(data)
+        remove_expired_keys()
         result = Result.new(false,"CLIENT_ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil
@@ -82,6 +88,7 @@ class Commands
     end
     def replace(data)
         data_in = noreply_correction(data)
+        remove_expired_keys()
         result = Result.new(false,"ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil
@@ -114,6 +121,13 @@ class Commands
         res = data.split.length == 2
         return res
     end
+    def check_input_commands_cas(data)       # Check amount of commands - CAS
+        res1 = data.split.length == 5
+        res2 = data.split.length == 6
+        res3 = data.split.length == 7
+        res4 = data.split.length == 8
+        return res1 || res2 || res3 || res4
+    end
 
     def key_validator(key)
         return (key.length < 250) ## && (control_character FALTA)
@@ -122,7 +136,7 @@ class Commands
         return (flag.length <= 16) && (is_number?(flag))
     end
     def exptime_validator(data)
-        max_time = 60*60*24*30      # FALTA
+        return is_number?(data)
     end
     def bytes_validator(bytes)
         return (bytes.length <= 8) && (is_number?(bytes))
@@ -139,9 +153,9 @@ class Commands
     end
 
     def storage_validator(data)
-        return key_validator(data[1]) && flag_validator(data[2]) && bytes_validator(data[4]) && msg_byte_validator(data)
+        return key_validator(data[1]) && flag_validator(data[2]) && exptime_validator(data[3]) && bytes_validator(data[4]) && msg_byte_validator(data)
     end    
-    #VER
+    
     def noreply_correction(data)
         nuevo = [data.split[0], data.split[1], data.split[2], data.split[3], data.split[4], "", ""]
         if data.split.length == 6
@@ -156,5 +170,33 @@ class Commands
             nuevo[6] = data.split[6]    
         end
         nuevo
+    end
+    
+    def expectime_correction(data)
+        max_time = 60*60*24*30
+        time_now = Time.now.to_i
+        result = 0
+        if data.to_i <= max_time
+            result = data.to_i + time_now
+        elsif data.to_i> max_time
+            result = data
+        else data.to_i == 0
+            result = data.to_i
+        end
+        result
+    end
+
+    def remove_expired_keys()
+        time_now = Time.now.to_i
+        puts "Remover 1"
+        @hash_comm.each do |key,data|
+            puts "Remover 2"
+            if data.expectime.to_i != 0
+                puts "Remover 3"
+                if (data.expectime.to_i - time_now) <= 0
+                    @hash_comm.delete(key)
+                end
+            end
+        end
     end
 end

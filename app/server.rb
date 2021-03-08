@@ -3,7 +3,6 @@
 
 require 'socket'
 require_relative 'commands'
-require_relative 'data_validate'
 
 PORT = 3000
 server =  TCPServer.new(PORT)
@@ -21,30 +20,25 @@ loop do
         when "get"                                          # <----- Retrieval commands ------>
             if command.check_input_commands_ret(user_input)
                 answer = command.get(user_input.split[1])
-                if answer.get_succ
-                    client.puts "#{answer.data}"
-                end
+                client.puts "#{answer.data}"
             else
                 client.puts "ERROR\r\n"
+                client.puts "Wrong number of parameters \r\n"
             end
         when "gets"
             if command.check_input_commands_ret(user_input)
                 client.puts "GETS_GETS"
             else
                 client.puts "ERROR\r\n"
+                client.puts "Wrong number of parameters \r\n"
             end
         when "set"                                          # <------ Storage commands ------->
-            #command.noreply_correction(user_input)
             if command.check_input_commands_st(user_input)
                 answer = command.set(user_input)
-                if answer.succ
-                    client.puts "#{answer.data}\r\n"
-                else
-                    client.puts "#{answer.data}\r\n"
-                end
+                client.puts "#{answer.data}\r\n"
             else
                 client.puts "ERROR\r\n"
-                client.puts "Wrong number of arguments\r\n"
+                client.puts "Wrong number of parameters \r\n"
             end
         when "add"
             if command.check_input_commands_st(user_input)
@@ -56,6 +50,7 @@ loop do
                 end
             else
                 client.puts "ERROR\r\n"
+                client.puts "Wrong number of parameters \r\n"
             end
         when "replace"
             if command.check_input_commands_st(user_input)
@@ -67,6 +62,7 @@ loop do
                 end
             else
                 client.puts "ERROR\r\n"
+                client.puts "Wrong number of parameters \r\n"
             end
         when "append"
             if command.check_input_commands_st(user_input)
@@ -78,6 +74,7 @@ loop do
                 end
             else
                 client.puts "ERROR\r\n"
+                client.puts "Wrong number of parameters \r\n"
             end
         when "prepend"
             if command.check_input_commands_st(user_input)
@@ -89,9 +86,15 @@ loop do
                 end
             else
                 client.puts "ERROR\r\n"
+                client.puts "Wrong number of parameters \r\n"
             end
         when "cas"
-            client.puts "CAS_CAS"
+            if command.check_input_commands_cas(user_input)
+                client.puts "CAS_CAS"
+            else
+                client.puts "ERROR\r\n"       
+                client.puts "Wrong number of parameters \r\n"
+            end
         when "q"                       # <-------- QUIT ----------->
             client.close
         else
