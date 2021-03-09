@@ -26,7 +26,8 @@ loop do
             end
         when "gets"
             if command.check_input_commands_ret(user_input)
-                client.puts "GETS_GETS"
+                answer = command.gets(user_input.split[1])
+                client.puts "#{answer.data}\r\n"
             else
                 client.puts "ERROR\r\n"
                 client.puts "Wrong number of parameters \r\n"
@@ -89,7 +90,8 @@ loop do
             end
         when "cas"
             if command.check_input_commands_cas(user_input)
-                client.puts "CAS_CAS"
+                answer = command.cas(user_input)
+                client.puts "#{answer.data}\r\n"
             else
                 client.puts "ERROR\r\n"       
                 client.puts "Wrong number of parameters \r\n"
