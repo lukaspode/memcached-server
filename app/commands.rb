@@ -118,16 +118,19 @@ class Commands
         data_in = noreply_correction(data)
         data_in[5] = token
         remove_expired_keys()
-        result = Result.new(false,"ERROR_1")
+        result = Result.new(false,"ERROR")
         if storage_validator(data_in)
-            puts "storage entro"
-            if @hash_comm[data_in[1]] != nil && @hash_comm[data_in[1]].unique_cas_token == token
-                to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
-                @hash_comm[data_in[1]] = to_store
-                result.set_succ(true)
-                result.set_data("STORED")
+            if @hash_comm[data_in[1]] != nil 
+                if @hash_comm[data_in[1]].unique_cas_token == token
+                    to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
+                    @hash_comm[data_in[1]] = to_store
+                    result.set_succ(true)
+                    result.set_data("STORED")
+                else
+                    result.set_data("EXISTS")
+                end
             else
-                result.set_data("NOT_STORED")
+                result.set_data("NOT_FOUND")
             end
         end
         result

@@ -73,7 +73,7 @@ loop do
                     client.puts "#{answer.data}\r\n"                        
                 end
             else
-                client.puts "ERROR\r\n"
+                client.puts "CLIENT_ERROR\r\n"
                 client.puts "Wrong number of parameters \r\n"
             end
         when "prepend"
@@ -85,7 +85,7 @@ loop do
                     client.puts "#{answer.data}\r\n"                        
                 end
             else
-                client.puts "ERROR\r\n"
+                client.puts "CLIENT_ERROR\r\n"
                 client.puts "Wrong number of parameters \r\n"
             end
         when "cas"
