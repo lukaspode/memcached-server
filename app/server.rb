@@ -1,26 +1,25 @@
 
-# LUCAS PODESTA not finished
+# LUCAS PODESTA - Memcached Server
 
 require 'socket'
 require_relative 'commands'
 
 PORT = 3000
 server =  TCPServer.new(PORT)
-command = Commands.new #Ver si ponerlo dentro del Loop cuando se conecta el cliente en el Server
 puts "Server running on #{PORT}"
 
 loop do
   Thread.start(server.accept) do |client|
     client.puts "Client connected to localhost:#{PORT}\r\n"
-    #client.puts "input format: add 10 12 33 0101 noreply hola\r\n\r\n"
-    puts "New client conected"
+    command = Commands.new # Ver si ponerlo dentro del Loop cuando se conecta el cliente en el Server o fuera (Mismo Hash para todos)
+    puts "New client connected"
     while user_input = client.gets
         request = user_input.split[0]
         case request #.chomp rompe cuando comando vacio, sin chomp no carga con espacio al final?
         when "get"                                          # <----- Retrieval commands ------>
             if command.check_input_commands_ret(user_input)
                 answer = command.get(user_input.split[1])
-                client.puts "#{answer.data}"
+                client.puts "#{answer.data}\r\n"
             else
                 client.puts "ERROR\r\n"
                 client.puts "Wrong number of parameters \r\n"
@@ -96,6 +95,10 @@ loop do
                 client.puts "Wrong number of parameters \r\n"
             end
         when "q"                       # <-------- QUIT ----------->
+            client.puts "Disconnecting from the Server...\r\n"
+            sleep(0.6)
+            client.printf "Client disconnected."
+            sleep(0.9)
             client.close
         else
             client.puts "ERROR\r\n"
