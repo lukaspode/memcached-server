@@ -11,24 +11,27 @@ class Commands
     #### ------------------------ #### 
     ###  -- Retrieval Commands --  ###
     #### ------------------------ #### 
-
-    def get(key)
-        result = Result.new(false,"Not value associated to the key: #{key}") #no es creada el Answer corregir (error pero secudnario, no requerido)
+    def get(data)
+        data_in = noreply_correction(data)
+        key = data_in[1]
+        result = Result.new(false,data_in,"Not value associated to the key: #{key}") #no es creada el Answer corregir (error pero secudnario, no requerido)
         remove_expired_keys()
         if (@hash_comm[key] != nil)
-            data = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()}\r\n #{@hash_comm[key].msg()}\r\n END\r\n"
-            result.data = data
+            data_m = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()}\r\n#{@hash_comm[key].msg()}\r\nEND\r\n"
+            result.set_message(data_m)
             result.succ = true
         end
         result
     end
-    def gets(key)
-        result = Result.new(false,"Not value associated to the key: #{key}")
+    def gets(data)
+        data_in = noreply_correction(data)
+        key = data_in[1]
+        result = Result.new(false,data_in,"Not value associated to the key: #{key}")
         remove_expired_keys()
         if (@hash_comm[key] != nil)
             @hash_comm[key].unique_cas_token =  generate_token(@hash_comm[key])
-            data = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()} #{@hash_comm[key].unique_cas_token()}\r\n #{@hash_comm[key].msg()}\r\n END\r\n"
-            result.data = data
+            data_m = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()} #{@hash_comm[key].unique_cas_token()}\r\n#{@hash_comm[key].msg()}\r\nEND\r\n"
+            result.set_message(data_m)
             result.succ = true
         end
         result
@@ -37,31 +40,30 @@ class Commands
     #### ---------------------- ####
     ###  -- Storage Commands --  ###
     #### ---------------------- #### 
-
     def set(data)                           # FUNCIONA 
         data_in = noreply_correction(data)
         remove_expired_keys()
-        result = Result.new(false,"ERROR_1")
+        result = Result.new(false,data_in,"ERROR")
         if storage_validator(data_in)
             to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]), data_in[4],data_in[5],data_in[6],data_in[7])
             @hash_comm[data_in[1]] = to_store
             result.set_succ(true)
-            result.set_data("STORED")
+            result.set_message("STORED")
         end
         result
     end
     def add(data)                           # FUNCIONA 
         data_in = noreply_correction(data)
         remove_expired_keys()
-        result = Result.new(false,"ERROR")
+        result = Result.new(false,data_in,"ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] == nil
-                to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]), data_in[4],data_in[5],data_in[6],data_in[7])
+                to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
                 @hash_comm[data_in[1]] = to_store
                 result.set_succ(true)
-                result.set_data("STORED")
+                result.set_message("STORED")
             else
-                result.set_data("NOT_STORED")
+                result.set_message("NOT_STORED")
             end
         end
         result
@@ -70,14 +72,14 @@ class Commands
     def append(data)
         data_in = noreply_correction(data)
         remove_expired_keys()
-        result = Result.new(false,"CLIENT_ERROR")
+        result = Result.new(false,data_in,"CLIENT_ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil
                 @hash_comm[data_in[1]].msg = @hash_comm[data_in[1]].msg + data_in[7]
                 result.set_succ(true)
-                result.set_data("STORED")
+                result.set_message("STORED")
             else
-                result.set_data("NOT_STORED")
+                result.set_message("NOT_STORED")
             end
         end
         result
@@ -85,14 +87,14 @@ class Commands
     def prepend(data)
         data_in = noreply_correction(data)
         remove_expired_keys()
-        result = Result.new(false,"CLIENT_ERROR")
+        result = Result.new(false,data_in,"CLIENT_ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil
                 @hash_comm[data_in[1]].msg = data_in[7] + @hash_comm[data_in[1]].msg
                 result.succ = true
-                result.set_data("STORED")
+                result.set_message("STORED")
             else
-                result.set_data("NOT_STORED")
+                result.set_message("NOT_STORED")
             end
         end
         result
@@ -100,37 +102,41 @@ class Commands
     def replace(data)
         data_in = noreply_correction(data)
         remove_expired_keys()
-        result = Result.new(false,"ERROR")
+        result = Result.new(false,data_in,"ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil
                 to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
                 @hash_comm[data_in[1]] = to_store
                 result.set_succ(true)
-                result.set_data("STORED")
+                result.set_message("STORED")
             else
-                result.set_data("NOT_STORED")
+                result.set_message("NOT_STORED")
             end
         end
        result
     end
     def cas(data)
-        token = data[4].to_i
+        token = data.split[5].to_i
         data_in = noreply_correction(data)
         data_in[5] = token
+        puts "data_in[5]: #{data_in[5]}"
+        puts "token: #{token}"
+        #data_in[5] = token
         remove_expired_keys()
-        result = Result.new(false,"ERROR")
+        result = Result.new(false,data_in,"ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil 
-                if @hash_comm[data_in[1]].unique_cas_token == token
+                puts "Distinto null: token #{@hash_comm[data_in[1]].unique_cas_token}"
+                if @hash_comm[data_in[1]].unique_cas_token.to_i == token
                     to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
                     @hash_comm[data_in[1]] = to_store
                     result.set_succ(true)
-                    result.set_data("STORED")
+                    result.set_message("STORED")
                 else
-                    result.set_data("EXISTS")
+                    result.set_message("EXISTS")
                 end
             else
-                result.set_data("NOT_FOUND")
+                result.set_message("NOT_FOUND")
             end
         end
         result
@@ -191,8 +197,8 @@ class Commands
     end    
     
     def noreply_correction(data)            # User input standar to Array of length 7
-        nuevo = [data.split[0], data.split[1], data.split[2], data.split[3],data.split[4], "empty",      ""      ,    "" ]
-        #           add             key         flag            expectime     bytes          cas       norepl      datablock
+        nuevo = [data.split[0],data.split[1],data.split[2],data.split[3],data.split[4],"","","" ]
+        #           add             key         flag            expectime     bytes      cas norepl datablock
         if data.split.length == 6
             if data.split[5] != "noreply"
                 nuevo[7] = data.split[5]
@@ -233,10 +239,6 @@ class Commands
     end
 
     def generate_token(data)
-        first_token = 1
-        if first_token == @token_stored
-            first_token += 1
-        end
-        @token_stored = first_token
+        @token_stored = @token_stored + 1
     end
 end

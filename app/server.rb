@@ -8,9 +8,11 @@ PORT = 3000
 server =  TCPServer.new(PORT)
 puts "Server running on #{PORT}"
 
+# Ver si usar patron factory y singleton para el server
+
 loop do
   Thread.start(server.accept) do |client|
-    client.puts "Client connected to localhost:#{PORT}\r\n"
+    client.puts "Client connected to localhost: #{PORT}\r\n"
     command = Commands.new # Ver si ponerlo dentro del Loop cuando se conecta el cliente en el Server o fuera (Mismo Hash para todos)
     puts "New client connected"
     while user_input = client.gets
@@ -18,16 +20,16 @@ loop do
         case request #.chomp rompe cuando comando vacio, sin chomp no carga con espacio al final?
         when "get"                                          # <----- Retrieval commands ------>
             if command.check_input_commands_ret(user_input)
-                answer = command.get(user_input.split[1])
-                client.puts "#{answer.data}\r\n"
+                answer = command.get(user_input)
+                client.puts "#{answer.message}\r\n"
             else
                 client.puts "ERROR\r\n"
                 client.puts "Wrong number of parameters \r\n"
             end
         when "gets"
             if command.check_input_commands_ret(user_input)
-                answer = command.gets(user_input.split[1])
-                client.puts "#{answer.data}\r\n"
+                answer = command.gets(user_input)
+                client.puts "#{answer.message}\r\n"
             else
                 client.puts "ERROR\r\n"
                 client.puts "Wrong number of parameters \r\n"
@@ -35,7 +37,7 @@ loop do
         when "set"                                          # <------ Storage commands ------->
             if command.check_input_commands_st(user_input)
                 answer = command.set(user_input)
-                client.puts "#{answer.data}\r\n"
+                client.puts "#{answer.message}\r\n"
             else
                 client.puts "ERROR\r\n"
                 client.puts "Wrong number of parameters \r\n"
@@ -44,9 +46,9 @@ loop do
             if command.check_input_commands_st(user_input)
                 answer = command.add(user_input)
                 if answer.succ
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 else
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 end
             else
                 client.puts "ERROR\r\n"
@@ -56,9 +58,9 @@ loop do
             if command.check_input_commands_st(user_input)
                 answer = command.replace(user_input)
                 if answer.succ
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 else
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 end
             else
                 client.puts "ERROR\r\n"
@@ -68,9 +70,9 @@ loop do
             if command.check_input_commands_st(user_input)
                 answer = command.append(user_input)
                 if answer.succ
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 else
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 end
             else
                 client.puts "CLIENT_ERROR\r\n"
@@ -80,9 +82,9 @@ loop do
             if command.check_input_commands_st(user_input)
                 answer = command.prepend(user_input)
                 if answer.succ
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 else
-                    client.puts "#{answer.data}\r\n"                        
+                    client.puts "#{answer.message}\r\n"                        
                 end
             else
                 client.puts "CLIENT_ERROR\r\n"
@@ -91,7 +93,7 @@ loop do
         when "cas"
             if command.check_input_commands_cas(user_input)
                 answer = command.cas(user_input)
-                client.puts "#{answer.data}\r\n"
+                client.puts "#{answer.message}\r\n"
             else
                 client.puts "ERROR\r\n"       
                 client.puts "Wrong number of parameters \r\n"
