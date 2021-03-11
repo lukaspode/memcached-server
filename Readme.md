@@ -29,7 +29,9 @@ _Once the previous steps are done, now we can proceed to run and send requests t
 ```
 ruby server.rb
 ```
-*you should get a message like this* : **Server running on 3000**
+*you should get a message like this* : **Server running on port: 3000**
+
+![Server running](/images/server_running.jpg)
 
 #### New client connection
 
@@ -38,6 +40,10 @@ ruby server.rb
 ```
 telnet localhost 3000
 ```
+![Client connection](/images/client_connection.jpg)
+
+![Client connected](/images/client_ok.jpg)
+
 ##Supported commands
 
 #### Retrieval commands
@@ -90,14 +96,12 @@ hi
 *The <cas unique argument> is just used for the cas command. *
 
 ## Real Examples
-#### Server
-![Server running](/images/server_running.jpg)
-#### Client
-![Client connection](/images/client_connection.jpg)
-![Client connected](/images/client_ok.jpg)
+
+#### Client input on console
+
 ![Set example](/images/set.jpg)
 ![Append,repend](/images/set_append_get.jpg)
-![Add, replace, cas](/images/cas.jpg)
+![Add, replace, cas](/images/cas_gets.jpg)
 
 ## Tests
 
