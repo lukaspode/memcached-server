@@ -218,7 +218,7 @@ class Commands
     
     def noreply_correction_cas(data)            # Idem but specifically for CAS command
         nuevo = [data[0],data[1],data[2],data[3],data[4],data[5],"","" ]
-        #           add    key    flag   expectime   bytes   cas norepl datablock
+        #           add   key    flag   expectime  bytes  cas  norep dt-block
         if data.length == 7
             if data[6] != "noreply"
                 nuevo[7] = data[6]

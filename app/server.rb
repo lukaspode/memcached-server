@@ -13,7 +13,7 @@ puts "Server running on port: #{PORT}"
 loop do
   Thread.start(server.accept) do |client|
     client.puts "Client connected to localhost: #{PORT}\r\n"
-    command = Commands.new # Ver si ponerlo dentro del Loop cuando se conecta el cliente en el Server o fuera (Mismo Hash para todos)
+    command = Commands.new 
     puts "New client connected"
     while console_input = client.gets
         request = console_input.split[0]

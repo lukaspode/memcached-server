@@ -112,8 +112,13 @@ rspec test_commands.rb
 ```
 and finally if everything is working correctly the terminal should display this: **XX examples, 0 failures**
 
+## Version
+
+Version 1.1.0
+
 ## References
 If you want more information about Memcached Server, Ruby installation or Ruby gems, check these links:
 - [Memcached Protocol](https://github.com/memcached/memcached/blob/master/doc/protocol.txt "Memcached Protocol")
 - [Ruby Official Website](https://www.ruby-lang.org/en/ "Ruby Official Website")
 - [Rspec Gem](https://rubygems.org/gems/rspec "Rspec Gem")
+- [Memcached commands](https://www.tutorialspoint.com/memcached/index.htm)
