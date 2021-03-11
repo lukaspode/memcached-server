@@ -6,7 +6,7 @@ require_relative 'commands'
 
 PORT = 3000
 server =  TCPServer.new(PORT)
-puts "Server running on #{PORT}"
+puts "Server running on port: #{PORT}"
 
 # Ver si usar patron factory y singleton para el server
 

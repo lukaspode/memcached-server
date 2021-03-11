@@ -9,7 +9,6 @@ _To run and use the server you must follow some previous steps._
 
 ```
 git clone https://github.com/lukaspode/memcached-server
-
 ```
 
 - Then you have to get installed ruby on your computer.
@@ -21,7 +20,7 @@ gem install rspec
 ```
 
 
-### Getting started 
+## Getting started 
 
 _Once the previous steps are done, now we can proceed to run and send requests to the server_
 #### Running the server
@@ -53,13 +52,52 @@ telnet localhost 3000
 5. ***prepend***
 6.  ***cas***
 
-## Usage examples
+## Input examples
 
 ```
-<command> <key> <flag> <expectime> <bytes> [noreply]\r\n <datablock>\r\n
-set john 4 200 6 lennon
+<command> <key> <flag> <expectime> <bytes> *<cas unique>* [noreply]\r\n <datablock>\r\n
+
+** Retrieval **
+
 get john
+
+gets john
+
+set john 4 200 6 (*press enter key*)
+lennon
+
+** Storage **
+
+set john 20 0 6 noreply (*press enter key*)
+lennon
+
+append jhon 23 250 6 (*press enter key*)
+_music
+
+prepend jhon 23 250 5 (*press enter key*)
+hello
+
+add juan 32 120 4 (*press enter key*)
+hola
+
+replace john 22 120 6 (*press enter key*)
+fogerty
+
+cas jhon 30 0 2 1 (*press enter key*)
+hi
+
 ```
+*The <cas unique argument> is just used for the cas command. *
+
+## Real Examples
+#### Server
+![Server running](/images/server_running.jpg)
+#### Client
+![Client connection](/images/client_connection.jpg)
+![Client connected](/images/client_ok.jpg)
+![Set example](/images/set.jpg)
+![Append,repend](/images/set_append_get.jpg)
+![Add, replace, cas](/images/cas.jpg)
 
 ## Tests
 
@@ -69,4 +107,9 @@ To run the tests first we have to run the server same as we did it at first, the
 rspec test_commands.rb
 ```
 and finally if everything is working correctly the terminal should display this: **XX examples, 0 failures**
-### Analice las pruebas end-to-end 🔩
+
+## References
+If you want more information about Memcached Server, Ruby installation or Ruby gems, check these links:
+- [Memcached Protocol](https://github.com/memcached/memcached/blob/master/doc/protocol.txt "Memcached Protocol")
+- [Ruby Official Website](https://www.ruby-lang.org/en/ "Ruby Official Website")
+- [Rspec Gem](https://rubygems.org/gems/rspec "Rspec Gem")
