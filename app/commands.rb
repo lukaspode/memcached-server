@@ -30,6 +30,7 @@ class Commands
         remove_expired_keys()
         if (@hash_comm[key] != nil)
             @hash_comm[key].unique_cas_token =  generate_token(@hash_comm[key])
+            data_in[5] = @hash_comm[key].unique_cas_token
             data_m = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()} #{@hash_comm[key].unique_cas_token()}\r\n#{@hash_comm[key].msg()}\r\nEND\r\n"
             result.set_message(data_m)
             result.succ = true
@@ -78,6 +79,7 @@ class Commands
                 @hash_comm[data_in[1]].msg = @hash_comm[data_in[1]].msg + data_in[7]
                 result.set_succ(true)
                 result.set_message("STORED")
+                result.set_data(data_in)
             else
                 result.set_message("NOT_STORED")
             end
@@ -119,14 +121,10 @@ class Commands
         token = data.split[5].to_i
         data_in = noreply_correction(data)
         data_in[5] = token
-        puts "data_in[5]: #{data_in[5]}"
-        puts "token: #{token}"
-        #data_in[5] = token
         remove_expired_keys()
         result = Result.new(false,data_in,"ERROR")
         if storage_validator(data_in)
             if @hash_comm[data_in[1]] != nil 
-                puts "Distinto null: token #{@hash_comm[data_in[1]].unique_cas_token}"
                 if @hash_comm[data_in[1]].unique_cas_token.to_i == token
                     to_store = Hash_t.new(data_in[2],expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
                     @hash_comm[data_in[1]] = to_store
@@ -141,6 +139,11 @@ class Commands
         end
         result
     end
+
+    #### ---------------------- ####
+    ### -- Error or non Exist -- ###   #VER SI LO USO O NO
+    #### ---------------------- #### 
+
 
     #### ------------------------ #### 
     ## --- Validation functions --- ##
