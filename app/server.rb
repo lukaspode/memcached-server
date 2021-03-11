@@ -15,8 +15,9 @@ loop do
     client.puts "Client connected to localhost: #{PORT}\r\n"
     command = Commands.new # Ver si ponerlo dentro del Loop cuando se conecta el cliente en el Server o fuera (Mismo Hash para todos)
     puts "New client connected"
-    while user_input = client.gets
-        request = user_input.split[0]
+    while console_input = client.gets
+        request = console_input.split[0]
+        user_input = console_input.split
         case request #.chomp rompe cuando comando vacio, sin chomp no carga con espacio al final?
         when "get"                                          # <----- Retrieval commands ------>
             if command.check_input_commands_ret(user_input)
@@ -35,6 +36,8 @@ loop do
                 client.puts "Wrong number of parameters \r\n"
             end
         when "set"                                          # <------ Storage commands ------->
+            data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+            user_input.push(data_block)
             if command.check_input_commands_st(user_input)
                 answer = command.set(user_input)
                 client.puts "#{answer.message}\r\n"
@@ -43,6 +46,8 @@ loop do
                 client.puts "Wrong number of parameters \r\n"
             end
         when "add"
+            data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+            user_input.push(data_block)
             if command.check_input_commands_st(user_input)
                 answer = command.add(user_input)
                 if answer.succ
@@ -55,6 +60,8 @@ loop do
                 client.puts "Wrong number of parameters \r\n"
             end
         when "replace"
+            data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+            user_input.push(data_block)
             if command.check_input_commands_st(user_input)
                 answer = command.replace(user_input)
                 if answer.succ
@@ -67,6 +74,8 @@ loop do
                 client.puts "Wrong number of parameters \r\n"
             end
         when "append"
+            data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+            user_input.push(data_block)
             if command.check_input_commands_st(user_input)
                 answer = command.append(user_input)
                 if answer.succ
@@ -79,6 +88,8 @@ loop do
                 client.puts "Wrong number of parameters \r\n"
             end
         when "prepend"
+            data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+            user_input.push(data_block)
             if command.check_input_commands_st(user_input)
                 answer = command.prepend(user_input)
                 if answer.succ
@@ -91,6 +102,8 @@ loop do
                 client.puts "Wrong number of parameters \r\n"
             end
         when "cas"
+            data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+            user_input.push(data_block)
             if command.check_input_commands_cas(user_input)
                 answer = command.cas(user_input)
                 client.puts "#{answer.message}\r\n"
