@@ -44,7 +44,7 @@ telnet localhost 3000
 
 ![Client connected](/images/client_ok.jpg)
 
-##Supported commands
+## Supported commands
 
 #### Retrieval commands
 1. ***get***
@@ -93,7 +93,7 @@ cas jhon 30 0 2 1 (*press enter key*)
 hi
 
 ```
-*The <cas unique argument> is just used for the cas command. *
+*The **cas unique argument** is just used for the **cas** command. *
 
 ## Real Examples
 
