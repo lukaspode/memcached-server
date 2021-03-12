@@ -64,18 +64,25 @@ telnet localhost 3000
 ## Input examples
 
 ```
-
+***************
 ** Retrieval **
+***************
 
 <command> <key>*\r\n
+* means one or more key strings separated by whitespace.
 
 get john
 
-gets john
+get john kristen
 
-_ * means one or more key strings separated by whitespace. _
+gets martin
 
+get martin kristen
+
+
+*************
 ** Storage **
+*************
 
 <command> <key> <flag> <expectime> <bytes> *<cas unique>* [noreply]\r\n <datablock>\r\n
 
