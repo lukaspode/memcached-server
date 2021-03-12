@@ -64,18 +64,23 @@ telnet localhost 3000
 ## Input examples
 
 ```
-<command> <key> <flag> <expectime> <bytes> *<cas unique>* [noreply]\r\n <datablock>\r\n
 
 ** Retrieval **
+
+<command> <key>*\r\n
 
 get john
 
 gets john
 
-set john 4 200 6 (*press enter key*)
-lennon
+_ * means one or more key strings separated by whitespace. _
 
 ** Storage **
+
+<command> <key> <flag> <expectime> <bytes> *<cas unique>* [noreply]\r\n <datablock>\r\n
+
+set john 4 200 6 (*press enter key*)
+lennon
 
 set john 20 0 6 noreply (*press enter key*)
 lennon
