@@ -23,4 +23,7 @@ class Result
     def get_message
         @message     
     end
+    def add_message(data)           # used for multiple keys on get/gets command
+        @message = @message + data
+    end
 end
