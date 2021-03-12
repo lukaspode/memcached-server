@@ -1,7 +1,7 @@
 # Memcached Server
 
 > _Memcached is an in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.
-["Memcached"](https://www.memcached.org/ ""Memcahced"")_
+["Memcached"](https://www.memcached.org/)_
 
 ## Installation 
 
@@ -32,18 +32,20 @@ ruby server.rb
 ```
 *you should get a message like this* : **Server running on port: 3000**
 
-![Server running](/images/server_running.jpg)
+![Server running](/img_rdm/server_running.jpg)
 
 #### New client connection
 
-- To connect a new client to the server, we open a new console dialoge (no matter where) and execute this:
+- To connect a new client to the server, we open a new console dialog (no matter where) and execute this:
 
 ```
 telnet localhost 3000
 ```
-![Client connection](/images/client_connection.jpg)
+- If we want to connect more than one client, we made the same procedure: open a new console dialog and run **telnet localhost 3000** again.
 
-![Client connected](/images/client_ok.jpg)
+![Client connection](/img_rdm/client_connection.jpg)
+
+![Client connected](/img_rdm/client_ok.jpg)
 
 ## Supported commands
 
@@ -100,9 +102,9 @@ hi
 
 #### Client input on console
 
-![Set example](/images/set.jpg)
-![Append,repend](/images/set_append_get.jpg)
-![Add, replace, cas](/images/cas_gets.jpg)
+![Set example](/img_rdm/set.jpg)
+![Append,repend](/img_rdm/set_append_get.jpg)
+![Add, replace, cas](/img_rdm/cas_gets.jpg)
 
 ## Tests
 
