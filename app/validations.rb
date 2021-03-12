@@ -24,7 +24,7 @@ class Validate
     end
 
     def key_validator(key)
-        return (key.length < 250) ## && (control_character FALTA)
+        return (key.length < 250) ## && (control_character Ver)
     end
     def flag_validator(flag)
         return (flag.length <= 16) && (unsigned_int(flag))

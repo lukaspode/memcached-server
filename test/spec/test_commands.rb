@@ -85,17 +85,46 @@ RSpec.describe Commands do
             expect(final_res.succ).to be true
             expect(final_res.message.split[0]).to eq("VALUE")
         end
-
+        it "Get: Multiple keys stored" do
+            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
+            result_1 = @mem_client.set(to_store)
+            expect(result_1.succ).to be true
+            expect(result_1.message).to eq("STORED")
+            to_store = ["set","martin","2","0","5","noreply","lopez"]     #Second key stored
+            result_2 = @mem_client.set(to_store)
+            expect(result_2.succ).to be true
+            expect(result_2.message).to eq("STORED")
+            request = ["get","#{result_1.data[1]}","#{result_2.data[2]}"]
+            final_res = @mem_client.get(request)
+            expect(final_res.succ).to be true
+            expect(final_res.message.split[0]).to eq("VALUE")
+        end
+        it "Get: Multiple keys. One key stored " do
+            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
+            result_1 = @mem_client.set(to_store)
+            expect(result_1.succ).to be true
+            expect(result_1.message).to eq("STORED")
+            to_store = ["set","martin","2","0","5","noreply","lope"]     #Second key not stored
+            result_2 = @mem_client.set(to_store)
+            expect(result_2.succ).to be false
+            expect(result_2.message).to eq("ERROR")
+            request = ["get","#{result_1.data[1]}","#{result_2.data[2]}"]
+            final_res = @mem_client.get(request)
+            expect(final_res.succ).to be true
+            expect(final_res.message.split[0]).to eq("VALUE")
+        end
+        
         #############################
         ##        Gets-Test        ##
         #############################
+
         it "Gets: clave 'john' no almacenada" do
             request = ["gets","john"]
             result = @mem_client.gets(request)
             expect(result.succ).to be false
             expect(result.message).to eq("Not value associated to the key: #{result.data[1]}")
         end
-        it "Gets: clave 'john' almacenada " do
+        it "Gets: key 'john' stored " do
             to_store = ["set","john","20","300","6","lennon"]
             result = @mem_client.set(to_store)
             expect(result.succ).to be true
@@ -105,7 +134,7 @@ RSpec.describe Commands do
             expect(final_res.succ).to be true
             expect(final_res.message.split[0]).to eq("VALUE")
         end  
-        it "Gets: clave 'john' almacenada " do
+        it "Gets: key 'john' stored with nonreply" do
             to_store = ["set","john","10","0","6","noreply","lennon"]
             result = @mem_client.set(to_store)
             expect(result.succ).to be true
@@ -115,7 +144,34 @@ RSpec.describe Commands do
             expect(final_res.succ).to be true
             expect(final_res.message.split[0]).to eq("VALUE")
         end
-
+        it "Gets: Multiple keys stored" do
+            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
+            result_1 = @mem_client.set(to_store)
+            expect(result_1.succ).to be true
+            expect(result_1.message).to eq("STORED")
+            to_store = ["set","martin","2","0","5","noreply","lopez"]     #Second key stored
+            result_2 = @mem_client.set(to_store)
+            expect(result_2.succ).to be true
+            expect(result_2.message).to eq("STORED")
+            request = ["gets", "#{result_1.data[1]}","#{result_2.data[2]}"]
+            final_res = @mem_client.gets(request)
+            expect(final_res.succ).to be true
+            expect(final_res.message.split[0]).to eq("VALUE")
+        end
+        it "Gets: Multiple keys. One stored" do
+            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
+            result_1 = @mem_client.set(to_store)
+            expect(result_1.succ).to be true
+            expect(result_1.message).to eq("STORED")
+            to_store = ["set","martin","2","0","5","noreply","lope"]     #Second key NOT stored
+            result_2 = @mem_client.set(to_store)
+            expect(result_2.succ).to be false
+            expect(result_2.message).to eq("ERROR")
+            request = ["gets", "#{result_1.data[1]}","#{result_2.data[2]}"]
+            final_res = @mem_client.gets(request)
+            expect(final_res.succ).to be true
+            expect(final_res.message.split[0]).to eq("VALUE")
+        end
         #############################
         ##       Append-Test       ##
         #############################
@@ -141,6 +197,7 @@ RSpec.describe Commands do
         #############################
         ##       Prepend-Test      ##
         #############################
+
         it "Prepend: key no existente" do
             request = ["prepend","paul","12","10","9","mccartney"]
             result = @mem_client.prepend(request)
@@ -259,6 +316,5 @@ RSpec.describe Commands do
         #############################
         ##       Multiple-Test     ##
         #############################
-
         
 end

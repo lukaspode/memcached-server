@@ -1,7 +1,7 @@
 
 require_relative 'commands'
 
-class Client
+class Petitions
     def initialize
         @validations = Validate.new
         @commands = Commands.new

@@ -1,6 +1,7 @@
 # Memcached Server
 
-_Acá va un párrafo que describa lo que es el proyecto_
+> _Memcached is an in-memory key-value store for small chunks of arbitrary data (strings, objects) from results of database calls, API calls, or page rendering.
+["Memcached"](https://www.memcached.org/ ""Memcahced"")_
 
 ## Installation 
 

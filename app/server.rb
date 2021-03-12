@@ -2,7 +2,7 @@
 # LUCAS PODESTA - Memcached Server
 
 require 'socket'
-require_relative 'client'
+require_relative 'client_petitions'
 require_relative 'validations'
 
 
@@ -12,6 +12,7 @@ class Server
         @PORT = 3000
         @server =  TCPServer.new(@PORT)
         @validations = Validate.new
+        @client_petitions = Petitions.new 
         @clients_connections = []
         puts "Server running on port: #{@PORT}"
     end
@@ -38,21 +39,20 @@ class Server
         loop do
         Thread.start(@server.accept) do |client|
             new_client_connection(client)
-            new_client = Client.new 
             while console_input = client.gets
                 request = console_input.split[0]
                 user_input = console_input.split
-                case request #.chomp rompe cuando comando vacio, sin chomp no carga con espacio al final?
+                case request
                 when "get"                                          # <----- Retrieval commands ------>
                     if @validations.check_input_commands_ret(user_input)
-                        answer = new_client.get(user_input)
+                        answer = @client_petitions.get(user_input)
                         client.puts "#{answer.message}"
                     else
                         client.puts "ERROR\r\nWrong number of parameters\r\n"
                     end
                 when "gets"
                     if @validations.check_input_commands_ret(user_input)
-                        answer = new_client.gets(user_input)
+                        answer = @client_petitions.gets(user_input)
                         client.puts "#{answer.message}"
                     else
                         client.puts "ERROR\r\nWrong number of parameters \r\n"
@@ -61,7 +61,7 @@ class Server
                     data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                     user_input.push(data_block)
                     if @validations.check_input_commands_st(user_input)
-                        answer = new_client.set(user_input)
+                        answer = @client_petitions.set(user_input)
                         client.puts "#{answer.message}\r\n"
                     else
                         client.puts "ERROR\r\nWrong number of parameters \r\n"
@@ -70,7 +70,7 @@ class Server
                     data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                     user_input.push(data_block)
                     if @validations.check_input_commands_st(user_input)
-                        answer = new_client.add(user_input)
+                        answer = @client_petitions.add(user_input)
                         client.puts "#{answer.message}\r\n"
                     else
                         client.puts "ERROR\r\nWrong number of parameters \r\n"
@@ -79,7 +79,7 @@ class Server
                     data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                     user_input.push(data_block)
                     if @validations.check_input_commands_st(user_input)
-                        answer = new_client.replace(user_input)
+                        answer = @client_petitions.replace(user_input)
                         client.puts "#{answer.message}\r\n"
                     else
                         client.puts "ERROR\r\nWrong number of parameters \r\n"
@@ -88,7 +88,7 @@ class Server
                     data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                     user_input.push(data_block)
                     if @validations.check_input_commands_st(user_input)
-                        answer = new_client.append(user_input)
+                        answer = @client_petitions.append(user_input)
                         client.puts "#{answer.message}\r\n"
                     else
                         client.puts "ERROR\r\nWrong number of parameters \r\n"
@@ -97,7 +97,7 @@ class Server
                     data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                     user_input.push(data_block)
                     if @validations.check_input_commands_st(user_input)
-                        answer = new_client.prepend(user_input)
+                        answer = @client_petitions.prepend(user_input)
                         client.puts "#{answer.message}\r\n"
                     else
                         client.puts "ERROR\r\nWrong number of parameters \r\n"
@@ -106,10 +106,10 @@ class Server
                     data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                     user_input.push(data_block)
                     if @validations.check_input_commands_cas(user_input)
-                        answer = new_client.cas(user_input)
+                        answer = @client_petitions.cas(user_input)
                         client.puts "#{answer.message}\r\n"
                     else
-                        client.puts "ERROR\r\nWrong number of parameters \r\n"
+                        client.puts "ERROR\r\nWrong number of parameters\r\n"
                     end
                 when "q"                       # <-------- QUIT ----------->
                     client_desconnection(client)

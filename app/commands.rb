@@ -13,6 +13,7 @@ class Commands
     #### ------------------------ #### 
     ###  -- Retrieval Commands --  ###
     #### ------------------------ #### 
+    
     def get(data)
         data_in = @validations.noreply_correction(data)
         number_keys = data.length
@@ -27,7 +28,7 @@ class Commands
             end
         end
         if result.succ == false
-            result.set_message("Not value associated to the key: #{data[1]}")
+            result.set_message("Not value associated to the key: #{data[1]}\r\n")
         end
         result
     end
@@ -47,7 +48,7 @@ class Commands
             end
         end
         if result.succ == false
-            result.set_message("Not value associated to the key: #{data[1]}")
+            result.set_message("Not value associated to the key: #{data[1]}\r\n")
         end
         result
     end
@@ -55,6 +56,7 @@ class Commands
     #### ---------------------- ####
     ###  -- Storage Commands --  ###
     #### ---------------------- #### 
+
     def set(data)
         data_in = @validations.noreply_correction(data)
         @validations.remove_expired_keys(@hash_comm)
@@ -153,9 +155,5 @@ class Commands
         end
         result
     end
-
-    #### ---------------------- ####
-    ### -- Error or non Exist -- ###   #VER SI LO USO O NO
-    #### ---------------------- #### 
     
 end
