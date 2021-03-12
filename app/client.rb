@@ -1,148 +1,39 @@
 
-require_relative 'hash_t'
-require_relative 'validations'
-require_relative 'results'
+require_relative 'commands'
 
-class Commands
+class Client
     def initialize
         @validations = Validate.new
+        @commands = Commands.new
     end
 
-    #### ------------------------ #### 
     ###  -- Retrieval Commands --  ###
-    #### ------------------------ #### 
+
     def get(data)
-        data_in = @validations.noreply_correction(data)
-        key = data_in[1]
-        result = Result.new(false,data_in,"Not value associated to the key: #{key}") #no es creada el Answer corregir (error pero secudnario, no requerido)
-        @validations.remove_expired_keys(@hash_comm)
-        if (@hash_comm[key] != nil)
-            data_m = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()}\r\n#{@hash_comm[key].msg()}\r\nEND\r\n"
-            result.set_message(data_m)
-            result.succ = true
-        end
-        result
+        return @commands.get(data)
     end
     def gets(data)
-        data_in = @validations.noreply_correction(data)
-        key = data_in[1]
-        result = Result.new(false,data_in,"Not value associated to the key: #{key}")
-        @validations.remove_expired_keys(@hash_comm)
-        if (@hash_comm[key] != nil)
-            @hash_comm[key].unique_cas_token =  @validations.generate_token(@hash_comm[key],@token_stored)
-            data_in[5] = @hash_comm[key].unique_cas_token
-            data_m = "VALUE #{key} #{@hash_comm[key].flag()} #{@hash_comm[key].bytes()} #{@hash_comm[key].unique_cas_token()}\r\n#{@hash_comm[key].msg()}\r\nEND\r\n"
-            result.set_message(data_m)
-            result.succ = true
-        end
-        result
+        return @commands.gets(data)
     end
 
-    #### ---------------------- ####
     ###  -- Storage Commands --  ###
-    #### ---------------------- #### 
+
     def set(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm)
-        result = Result.new(false,data_in,"ERROR")
-        if @validations.storage_validator(data_in)
-            to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]), data_in[4],data_in[5],data_in[6],data_in[7])
-            @hash_comm[data_in[1]] = to_store
-            result.set_succ(true)
-            result.set_message("STORED")
-        end
-        result
+        return @commands.set(data)
     end
     def add(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm)
-        result = Result.new(false,data_in,"ERROR")
-        if @validations.storage_validator(data_in)
-            if @hash_comm[data_in[1]] == nil
-                to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
-                @hash_comm[data_in[1]] = to_store
-                result.set_succ(true)
-                result.set_message("STORED")
-            else
-                result.set_message("NOT_STORED")
-            end
-        end
-        result
+        return @commands.add(data)
     end
-    #The append and prepend commands do not accept flags or exptime.They update existing data portions, and ignore new flag and exptime settings.
     def append(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm)
-        result = Result.new(false,data_in,"CLIENT_ERROR")
-        if @validations.storage_validator(data_in)
-            if @hash_comm[data_in[1]] != nil
-                @hash_comm[data_in[1]].msg = @hash_comm[data_in[1]].msg + data_in[7]
-                result.set_succ(true)
-                result.set_message("STORED")
-                result.set_data(data_in)
-            else
-                result.set_message("NOT_STORED")
-            end
-        end
-        result
+        return @commands.append(data)
     end
     def prepend(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm)
-        result = Result.new(false,data_in,"CLIENT_ERROR")
-        if @validations.storage_validator(data_in)
-            if @hash_comm[data_in[1]] != nil
-                @hash_comm[data_in[1]].msg = data_in[7] + @hash_comm[data_in[1]].msg
-                result.succ = true
-                result.set_message("STORED")
-            else
-                result.set_message("NOT_STORED")
-            end
-        end
-        result
+        return @commands.prepend(data)
     end
     def replace(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm)
-        result = Result.new(false,data_in,"ERROR")
-        if @validations.storage_validator(data_in)
-            if @hash_comm[data_in[1]] != nil
-                to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
-                @hash_comm[data_in[1]] = to_store
-                result.set_succ(true)
-                result.set_message("STORED")
-            else
-                result.set_message("NOT_STORED")
-            end
-        end
-       result
+        return @commands.replace(data)
     end
     def cas(data)
-        token = data[5].to_i
-        data_in = @validations.noreply_correction_cas(data)
-        data_in[5] = token
-        @validations.remove_expired_keys(@hash_comm)
-        result = Result.new(false,data_in,"ERROR")
-        if @validations.storage_validator(data_in)
-            if @hash_comm[data_in[1]] != nil 
-                if @hash_comm[data_in[1]].unique_cas_token.to_i == token
-                    to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
-                    @hash_comm[data_in[1]] = to_store
-                    result.set_succ(true)
-                    result.set_message("STORED")
-                else
-                    result.set_message("EXISTS")
-                end
-            else
-                result.set_message("NOT_FOUND")
-            end
-        end
-        result
+        return @commands.cas(data)
     end
-
-    #### ---------------------- ####
-    ### -- Error or non Exist -- ###   #VER SI LO USO O NO
-    #### ---------------------- #### 
-
-
 end
