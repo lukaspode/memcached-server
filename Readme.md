@@ -6,7 +6,7 @@
 ## Installation 
 
 _To run and use the server you must follow some previous steps._
-- First you must clone the repositorie wherever you want to have the project.
+- First you must clone the repository wherever you want to have the project.
 
 ```
 git clone https://github.com/lukaspode/memcached-server
