@@ -12,11 +12,7 @@ _To run and use the server you must follow some previous steps._
 git clone https://github.com/lukaspode/memcached-server
 ```
 
-<<<<<<< HEAD
 - Then you have to get installed **Ruby** on your computer.
-=======
-- Then you have to get installed Ruby on your computer.
->>>>>>> 248038f389ebb4738799b2c1f7e2b7822b995ed9
 
 - And optionally, if you want to run the tests you should install Ruby gem: **Rspec**
 
@@ -34,11 +30,7 @@ _Once the previous steps are done, we can proceed to run and send requests to th
 ```
 ruby server.rb
 ```
-<<<<<<< HEAD
 *you will get the following message * : **Server running on port: 3000**
-=======
-*you would get the following message * : **Server running on port: 3000**
->>>>>>> 248038f389ebb4738799b2c1f7e2b7822b995ed9
 
 ![Server running](/img_rdm/server_running.jpg)
 
@@ -133,11 +125,7 @@ To run the tests first we have to run the server as we did it at first, then we 
 ```
 rspec test_commands.rb
 ```
-<<<<<<< HEAD
 and finally, if everything is working correctly the terminal would display this message: **27 examples, 0 failures**
-=======
-and finally, if everything is working correctly the terminal would display this message: **XX examples, 0 failures**
->>>>>>> 248038f389ebb4738799b2c1f7e2b7822b995ed9
 
 ## Version
 
