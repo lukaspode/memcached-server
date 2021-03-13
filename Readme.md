@@ -30,7 +30,7 @@ _Once the previous steps are done, we can proceed to run and send requests to th
 ```
 ruby server.rb
 ```
-*you will get the following message * : **Server running on port: 3000**
+*you will get the following message* : **Server running on port: 3000**
 
 ![Server running](/img_rdm/server_running.jpg)
 
