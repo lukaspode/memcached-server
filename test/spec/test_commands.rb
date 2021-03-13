@@ -34,7 +34,7 @@ RSpec.describe Commands do
             expect(result.message).to eq("STORED")
             final_res = @mem_client.get(["get","#{result.data[1]}"])
             expect(final_res.succ).to be false
-            expect(final_res.message).to eq("Not value associated to the key: #{result.data[1]}")
+            expect(final_res.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
         end
 
         it "Set: Expectime expired and then 'get key" do
@@ -45,7 +45,7 @@ RSpec.describe Commands do
             sleep(2.1)
             final_res = @mem_client.get(["get", "#{result.data[1]}"])
             expect(final_res.succ).to be false
-            expect(final_res.message).to eq("Not value associated to the key: #{result.data[1]}")
+            expect(final_res.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
         end
 
         it "Set: bytes and data block not matching" do
@@ -73,7 +73,7 @@ RSpec.describe Commands do
             request = ["get","pedro"]
             result = @mem_client.get(request)
             expect(result.succ).to be false
-            expect(result.message).to eq("Not value associated to the key: #{result.data[1]}")
+            expect(result.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
         end        
         it "Get: clave 'juan' almacenada " do
             to_store = ["set","juan","2","0","5","noreply","lopez"]
@@ -122,7 +122,7 @@ RSpec.describe Commands do
             request = ["gets","john"]
             result = @mem_client.gets(request)
             expect(result.succ).to be false
-            expect(result.message).to eq("Not value associated to the key: #{result.data[1]}")
+            expect(result.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
         end
         it "Gets: key 'john' stored " do
             to_store = ["set","john","20","300","6","lennon"]
