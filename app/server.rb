@@ -16,7 +16,7 @@ class Server
         
     def new_client_connection(new_client)
       new_client.puts "Client connected to localhost: #{@PORT}\r\n"
-      new_client.puts 'Waiting for your requests:\r\n'
+      new_client.puts "Waiting for your requests:\r\n"
     end
 
     def client_desconnection(quit_client)
@@ -39,58 +39,41 @@ class Server
                 # <----- Retrieval commands ------>
               when "get"
                 answer = @client_petitions.get(user_input)
-                client.puts "#{answer.message}"
               when "gets"
                 answer = @client_petitions.gets(user_input)
-                client.puts "#{answer.message}"
                 # <------ Storage commands ------->
               when "set"
                 data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                 user_input.push(data_block)
                 answer = @client_petitions.set(user_input)
-                if(!answer.noreply)
-                  client.puts "#{answer.message}"
-                end
               when "add"
                 data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                 user_input.push(data_block)
                 answer = @client_petitions.add(user_input)
-                if(!answer.noreply)
-                  client.puts "#{answer.message}"
-                end
               when "replace"
                 data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                 user_input.push(data_block)
                 answer = @client_petitions.replace(user_input)
-                if(!answer.noreply)
-                  client.puts "#{answer.message}"
-                end
               when "append"
                 data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                 user_input.push(data_block)
                 answer = @client_petitions.append(user_input)
-                if(!answer.noreply)
-                  client.puts "#{answer.message}"
-                end
               when "prepend"
                 data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                 user_input.push(data_block)
                 answer = @client_petitions.prepend(user_input)
-                if(!answer.noreply)
-                  client.puts "#{answer.message}"
-                end
               when "cas"
                 data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                 user_input.push(data_block)
                 answer = @client_petitions.cas(user_input)
-                if(!answer.noreply)
-                  client.puts "#{answer.message}"
-                end
                 # <-------- QUIT ----------->
               when "q"                       
                 client_desconnection(client)
               else
                 client.puts 'ERROR Command not found or supported.\r\n'
+              end
+              if(!answer.noreply)
+                client.puts "#{answer.message}"
               end
             end
         end
