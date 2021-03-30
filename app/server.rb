@@ -70,7 +70,8 @@ class Server
               when "q"                       
                 client_desconnection(client)
               else
-                client.puts 'ERROR Command not found or supported.\r\n'
+                client.puts "ERROR Command not found or supported.\r\n"
+                next
               end
               if(!answer.noreply)
                 client.puts "#{answer.message}"

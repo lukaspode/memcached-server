@@ -6,17 +6,23 @@ class Validate
     def unsigned_int(number)
       return is_number?(number) && number.to_i>=0        
     end
-    def check_input_commands_st(data)       # Check amount of commands - STORAGE
+
+    # Check amount of commands - STORAGE
+    def check_input_commands_st(data)
       res1 = data.length == 5
       res2 = data.length == 6
       res3 = data.length == 7
       return res1 || res2 || res3
     end
-    def check_input_commands_ret(data)       # Check amount of commands - RETRIEVAL
+
+    # Check amount of commands - RETRIEVAL
+    def check_input_commands_ret(data)
       res = data.length >= 2
       return res
     end
-    def check_input_commands_cas(data)       # Check amount of commands - CAS
+
+    # Check amount of commands - CAS
+    def check_input_commands_cas(data)
       res1 = data.length == 6
       res2 = data.length == 7
       res3 = data.length == 8
@@ -39,7 +45,9 @@ class Validate
       return (data.length <= 8)
     end
     def noreply_validator(data)
-      return (data == "noreply" || data == "")
+      res = (data[6] == "noreply" || data[6] == "")
+      data[6] = (data[6] == "noreply")
+      return res
     end
 
     # Check match between Bytes and DataBlock
@@ -49,41 +57,38 @@ class Validate
 
     # Check Input requirments
     def storage_validator(data)
-      return key_validator(data[1]) && flag_validator(data[2]) && exptime_validator(data[3]) && bytes_validator(data[4]) && noreply_validator(data[6]) && msg_byte_validator(data)
+      return key_validator(data[1]) && flag_validator(data[2]) && exptime_validator(data[3]) && bytes_validator(data[4]) && noreply_validator(data) && msg_byte_validator(data)
     end    
 
     # User input standar to Array of length 8
-    def noreply_correction(data)
+    def noreply_correction(data,cas)
       nuevo = [data[0],data[1],data[2],data[3],data[4],"","","" ]
       #           add    key    flag   expectime   bytes   cas norepl datablock
-      if data.length == 6
-        if data[5] != "noreply"
-          nuevo[7] = data[5]
-          nuevo[6] = ""
-        else
-          nuevo[6] = "noreply"
+      if (cas == false)
+        if data.length == 6
+          if data[5] != "noreply"
+            nuevo[7] = data[5]
+            nuevo[6] = ""
+          else
+            nuevo[6] = "noreply"
+          end
+        elsif data.length == 7
+          nuevo[6] = data[5]    
+          nuevo[7] = data[6]    
         end
-      elsif data.length == 7
-        nuevo[6] = data[5]    
-        nuevo[7] = data[6]    
-      end
-      nuevo
-    end
-
-    # Idem but specifically for CAS command
-    def noreply_correction_cas(data)
-      nuevo = [data[0],data[1],data[2],data[3],data[4],data[5],"","" ]
-      #           add   key    flag   expectime  bytes  cas  norep dt-block
-      if data.length == 7
-        if data[6] != "noreply"
-          nuevo[7] = data[6]
-          nuevo[6] = ""
-        else
-          nuevo[6] = "noreply"
+      else
+        nuevo[5] = data[5]
+        if data.length == 7
+          if data[6] != "noreply"
+            nuevo[7] = data[6]
+            nuevo[6] = ""
+          else
+            nuevo[6] = "noreply"
+          end
+        elsif data.length == 8
+          nuevo[6] = data[6]    
+          nuevo[7] = data[7]    
         end
-      elsif data.length == 8
-        nuevo[6] = data[6]    
-        nuevo[7] = data[7]    
       end
       nuevo
     end

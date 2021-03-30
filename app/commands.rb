@@ -18,12 +18,12 @@ class Commands
     def get(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_ret(data)
-        data_in = @validations.noreply_correction(data)
+        data_in = @validations.noreply_correction(data,false)
         number_keys = data.length
         result.data = data_in
         result.message = ''
-        @validations.remove_expired_keys(@hash_comm,data_in[1])
         for i in 1..number_keys do
+          @validations.remove_expired_keys(@hash_comm,data_in[i])
           key = data[i]
           if (@hash_comm[key] != nil)
             data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes}\r\n#{@hash_comm[key].msg}\r\nEND"
@@ -41,7 +41,7 @@ class Commands
     def gets(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_ret(data)
-        data_in = @validations.noreply_correction(data)
+        data_in = @validations.noreply_correction(data,false)
         number_keys = data.length
         result.data = data_in
         result.message = ''
@@ -71,18 +71,12 @@ class Commands
     def set(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_st(data)
-          data_in = @validations.noreply_correction(data)
-          @validations.remove_expired_keys(@hash_comm,data_in[1])
+          data_in = update_input_st(data,false)
           result.data = data_in
           result.message = ERROR
           if @validations.storage_validator(data_in)
-            to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]), data_in[4],data_in[5],data_in[6],data_in[7])
-            @hash_comm[data_in[1]] = to_store
-            if(data_in[6] === 'noreply')
-              result.noreply = true
-            end
-            result.succ = true
-            result.message = STORED
+            result.noreply = data_in[6]
+            store(data_in,result)
           end
         end
       result.message += LN_BREAK
@@ -91,21 +85,15 @@ class Commands
     def add(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_st(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm,data_in[1])
+        data_in = update_input_st(data,false)
         result.data = data_in
         result.message = ERROR
         if @validations.storage_validator(data_in)
+          result.noreply = data_in[6]
           if @hash_comm[data_in[1]] == nil
-            to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
-            @hash_comm[data_in[1]] = to_store
-            result.succ = true
-            result.message = STORED
+            store(data_in,result)
           else
             result.message = NOT_STORED
-          end
-          if(data_in[6] === 'noreply')
-            result.noreply = true
           end
         end
       end
@@ -115,21 +103,15 @@ class Commands
     def replace(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_st(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm,data_in[1])
+        data_in = update_input_st(data,false)
         result.data = data_in
         result.message = ERROR
         if @validations.storage_validator(data_in)
+          result.noreply = data_in[6]
           if @hash_comm[data_in[1]] != nil
-            to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
-            @hash_comm[data_in[1]] = to_store
-            result.succ = true
-            result.message = STORED
+            store(data_in,result)
           else
             result.message = NOT_STORED
-          end
-          if(data_in[6] === 'noreply')
-            result.noreply = true
           end
         end
       end
@@ -140,11 +122,11 @@ class Commands
     def append(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_st(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm,data_in[1])
+        data_in = update_input_st(data,false)
         result.data = data_in
         result.message = CLIENT_ERROR
         if @validations.storage_validator(data_in)
+          result.noreply = data_in[6]
           if @hash_comm[data_in[1]] != nil
             @hash_comm[data_in[1]].msg = @hash_comm[data_in[1]].msg + data_in[7]
             result.succ = true
@@ -152,9 +134,6 @@ class Commands
             result.data = data_in
           else
             result.message = NOT_STORED
-          end
-          if(data_in[6] === 'noreply')
-            result.noreply = true
           end
         end
       end
@@ -164,20 +143,17 @@ class Commands
     def prepend(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_st(data)
-        data_in = @validations.noreply_correction(data)
-        @validations.remove_expired_keys(@hash_comm,data_in[1])
+        data_in = update_input_st(data,false)
         result.data = data_in
         result.message = CLIENT_ERROR
         if @validations.storage_validator(data_in)
+          result.noreply = data_in[6]
           if @hash_comm[data_in[1]] != nil
             @hash_comm[data_in[1]].msg = data_in[7] + @hash_comm[data_in[1]].msg
             result.succ = true
             result.message = STORED
           else
             result.message= NOT_STORED
-          end
-          if(data_in[6] === 'noreply')
-            result.noreply = true
           end
         end
       end
@@ -188,26 +164,20 @@ class Commands
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_st(data)
         token = data[5].to_i
-        data_in = @validations.noreply_correction_cas(data)
+        data_in = update_input_st(data,true)
         data_in[5] = token
-        @validations.remove_expired_keys(@hash_comm,data_in[1])
         result.data = data_in
         result.message = ERROR
         if @validations.storage_validator(data_in)
+          result.noreply = data_in[6]
           if @hash_comm[data_in[1]] != nil 
             if @hash_comm[data_in[1]].unique_cas_token.to_i == token
-              to_store = Hash_t.new(data_in[2],@validations.expectime_correction(data_in[3]),data_in[4],data_in[5],data_in[6],data_in[7])
-              @hash_comm[data_in[1]] = to_store
-              result.succ = true
-              result.message = STORED
+              store(data_in,result)
             else
               result.message = EXISTS
             end
           else
             result.message = NOT_FOUND
-          end
-          if(data_in[6] === 'noreply')
-            result.noreply = true
           end
         end
       end
@@ -215,4 +185,17 @@ class Commands
       result
     end
     
+    #### ---------------------- ####
+    ### -- Auxiliar Functions -- ###
+    #### ---------------------- #### 
+
+    def store(data,result)
+      @hash_comm[data[1]] = Hash_t.new(data[2],@validations.expectime_correction(data[3]),data[4],data[5],data[6],data[7])
+      result.succ = true
+      result.message = STORED
+    end
+    def update_input_st(data,cas)
+      @validations.remove_expired_keys(@hash_comm,data[1])
+      return @validations.noreply_correction(data,cas)
+    end
 end
