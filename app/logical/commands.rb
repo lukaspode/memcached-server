@@ -2,7 +2,7 @@
 require_relative 'hash_t'
 require_relative 'validate'
 require_relative 'result'
-require_relative 'messages'
+require_relative '../messages'
 
 class Commands
     def initialize
@@ -14,7 +14,6 @@ class Commands
     #### ------------------------ #### 
     ###  -- Retrieval Commands --  ###
     #### ------------------------ #### 
-    
     def get(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_ret(data)
@@ -26,7 +25,7 @@ class Commands
           @validations.remove_expired_keys(@hash_comm,data_in[i])
           key = data[i]
           if (@hash_comm[key] != nil)
-            data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes}\r\n#{@hash_comm[key].msg}\r\nEND"
+            data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes}\r\n#{@hash_comm[key].msg}\r\nEND\r\n"
             result.add_message(data_m)
             result.succ = true
           end
@@ -35,7 +34,6 @@ class Commands
           result.message = NOT_ASOCIATED + data[1]
         end
       end
-      result.message += LN_BREAK
       result
     end
     def gets(data)
@@ -45,13 +43,13 @@ class Commands
         number_keys = data.length
         result.data = data_in
         result.message = ''
-        @validations.remove_expired_keys(@hash_comm,data_in[1])
         for i in 1..number_keys do
+          @validations.remove_expired_keys(@hash_comm,data_in[i])
           key = data[i]
           if (@hash_comm[key] != nil)
             @hash_comm[key].unique_cas_token =  @validations.generate_token(@hash_comm[key],@token_stored)
             data_in[5] = @hash_comm[key].unique_cas_token
-            data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes} #{@hash_comm[key].unique_cas_token}\r\n#{@hash_comm[key].msg}\r\nEND"
+            data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes} #{@hash_comm[key].unique_cas_token}\r\n#{@hash_comm[key].msg}\r\nEND\r\n"
             result.add_message(data_m)
             result.succ = true
           end
@@ -60,14 +58,12 @@ class Commands
           result.message = NOT_ASOCIATED + data[1]
         end
       end
-      result.message += LN_BREAK
       result
     end
 
     #### ---------------------- ####
     ###  -- Storage Commands --  ###
     #### ---------------------- #### 
-
     def set(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
       if @validations.check_input_commands_st(data)
@@ -184,11 +180,14 @@ class Commands
       result.message += LN_BREAK
       result
     end
-    
+    def help
+      HELP_MENU
+    end
+
+    private
     #### ---------------------- ####
     ### -- Auxiliar Functions -- ###
     #### ---------------------- #### 
-
     def store(data,result)
       @hash_comm[data[1]] = Hash_t.new(data[2],@validations.expectime_correction(data[3]),data[4],data[5],data[6],data[7])
       result.succ = true

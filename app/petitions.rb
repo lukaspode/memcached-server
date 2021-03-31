@@ -1,5 +1,5 @@
 
-require_relative 'commands'
+require_relative 'logical/commands'
 
 class Petitions
     def initialize
@@ -35,5 +35,8 @@ class Petitions
     end
     def cas(data)
       return @commands.cas(data)
+    end
+    def help()
+      return @commands.help()
     end
 end

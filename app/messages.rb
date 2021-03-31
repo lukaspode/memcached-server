@@ -18,3 +18,16 @@ LN_BREAK = "\r\n"
 WRONG_PARAMETERS = 'Wrong number of parameters.'
 NOT_ASOCIATED = 'Not value associated to the key: '
 #COMMAND_NOT_FOUND 'Command not found or supported.'
+
+
+# Ver si ponerlo
+HELP_MENU = 
+'
+    * * * * * * * * * * * * * * * * * * * * * * * * *
+    * * * * *    Memcahed Server - Help     * * * * *
+    * * * * * * * * * * * * * * * * * * * * * * * * *
+
+    Commands supported
+        Retrival:   get,gets
+        Storage:    set,add,replace,append,prepend,cas
+'

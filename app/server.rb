@@ -66,6 +66,9 @@ class Server
                 data_block = client.gets( "\r\n" ).chomp( "\r\n" )
                 user_input.push(data_block)
                 answer = @client_petitions.cas(user_input)
+              when "help"                       
+                client.puts "#{@client_petitions.help()}"
+                next
                 # <-------- QUIT ----------->
               when "q"                       
                 client_desconnection(client)

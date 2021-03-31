@@ -1,5 +1,5 @@
 #require_relative '../../app/server'
-require_relative '../../app/commands'
+require_relative '../../app/logical/commands'
 
 
 RSpec.describe Commands do
