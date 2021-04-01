@@ -20,7 +20,7 @@ class Server
       new_client.puts 'Waiting for your requests:' + "\r\n"
     end
 
-    def client_desconnection(quit_client)
+    def client_disconnection(quit_client)
       quit_client.puts 'Disconnecting from the Server...' + "\r\n"
       sleep(0.6)
       quit_client.printf 'Client disconnected.'
@@ -73,7 +73,7 @@ class Server
                 next
                 # <-------- QUIT ----------->
               when "q"                       
-                client_desconnection(client)
+                client_disconnection(client)
                 break
               else
                 client.puts "ERROR Command not found or supported.\r\n"

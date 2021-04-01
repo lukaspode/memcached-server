@@ -2,7 +2,7 @@ class Result
     attr_accessor :succ, :data, :message, :noreply
     def initialize(succ,data,message,noreply)
       @succ = succ
-      @data = data        
+      @data = data
       @message = message
       @noreply = noreply
     end

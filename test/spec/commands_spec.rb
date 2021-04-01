@@ -1,5 +1,6 @@
 #require_relative '../../app/server'
 require_relative '../../app/logical/commands'
+require_relative '../../app/messages'
 
 
 RSpec.describe Commands do
@@ -8,6 +9,24 @@ RSpec.describe Commands do
             #@mem_server = Server.new
             @mem_client = Commands.new
         end
+        # set
+        subject(:set_martin) {["set", "martin", "2", "1", "4","noreply","hola"]}
+        subject(:set_kristen) {["set", "kristen", "0", "2", "5","noreply","hello"]}
+        subject(:set_john_not) {["set", "john", "0", "2", "3","hello"]}
+        #append
+        subject(:append_kristen) {["append","kristen","22","150","6","_bello"]}
+        #prepend
+        subject(:prepend_martin) {["prepend", "martin", "2", "2", "5","_chau"]}
+        #add
+        subject(:add_martin) {["add","martin","3","1","4","_bye"]}
+        subject(:add_kristen) {["add","kristen","7","120","5","hello"]}
+        #replace
+        subject(:replace_martin) {["replace","martin","32","10","5","steve"]}
+        #cas
+        subject(:cas_kristen) {["cas", "kristen", "22", "2", "4","1","_bye"]}
+        # retrivals
+        subject(:get_1) {["get", "martin"]}
+        subject(:gets_1) {["gets", "kristen"]}
 
         #############################
         ##        Set-Test         ##
@@ -16,300 +35,197 @@ RSpec.describe Commands do
         it "Set: Simple set without 'noreply'" do
             request = ["set", "1", "2", "0", "4", "hola"]
             result = @mem_client.set(request)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
+            expect(result.message).to eq(STORED + LN_BREAK)
         end
 
         it "Set: Simple set with 'noreply'" do
-            request = ["set", "juan", "2", "0", "4","noreply","hola"]
-            result = @mem_client.set(request)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
+            result = @mem_client.set(set_martin)
+            expect(result.message).to eq(EMPTY + LN_BREAK)
         end
-        
+
         it "Set: Stored and automatically deleted" do
-            request = ["set", "pedro", "2", "-1", "5","noreply","hello"] 
-            result = @mem_client.set(request)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
+            result = @mem_client.set(["set", "juan", "2", "-1", "4","hola"])
             final_res = @mem_client.get(["get","#{result.data[1]}"])
-            expect(final_res.succ).to be false
-            expect(final_res.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
+            expect(final_res.message).to eq(NOT_ASOCIATED + "#{result.data[1]}" + LN_BREAK)
         end
 
         it "Set: Expectime expired and then 'get key" do
-            request = ["set", "martin", "2", "2", "5","noreply","hello"] 
-            result = @mem_client.set(request)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
-            sleep(2.1)
+            result = @mem_client.set(set_martin)
+            sleep(1.1)
             final_res = @mem_client.get(["get", "#{result.data[1]}"])
-            expect(final_res.succ).to be false
-            expect(final_res.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
+            expect(final_res.message).to eq(NOT_ASOCIATED + "#{result.data[1]}" + LN_BREAK)
         end
 
         it "Set: bytes and data block not matching" do
-            request = ["set","pedro","2","350","5","noreply","bye"]
-            result = @mem_client.set(request)
-            expect(result.succ).to be false
-            expect(result.message).to eq("ERROR\r\n")
+            result = @mem_client.set(set_john_not)
+            expect(result.message).to eq(ERROR + LN_BREAK)
         end
 
         it "Set: data block empty" do
             request = ["set","1","2","20","0"]
             result = @mem_client.set(request)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
-            final_res = @mem_client.get(["get", "#{result.data[1]}"])
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
+            expect(result.message).to eq(STORED + LN_BREAK)
         end
 
         #############################
         ##        Get-Test         ##
         #############################
 
-        it "Get: clave 'pedro' no almacenada" do
-            request = ["get","pedro"]
-            result = @mem_client.get(request)
-            expect(result.succ).to be false
-            expect(result.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
+        it "Get: clave 'martin' no almacenada" do
+            result = @mem_client.get(get_1)
+            expect(result.message).to eq(NOT_ASOCIATED + "#{result.data[1]}" + LN_BREAK)
         end        
-        it "Get: clave 'juan' almacenada " do
-            to_store = ["set","juan","2","0","5","noreply","lopez"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
-            request = ["get","#{result.data[1]}"]
-            final_res = @mem_client.get(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
+        it "Get: clave 'martin' almacenada " do
+            result = @mem_client.set(set_martin)
+            final_res = @mem_client.get(get_1)
+            expect(final_res.message.split[0]).to eq('VALUE')
         end
         it "Get: Multiple keys stored" do
-            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
-            result_1 = @mem_client.set(to_store)
-            expect(result_1.succ).to be true
-            expect(result_1.message).to eq("STORED\r\n")
-            to_store = ["set","martin","2","0","5","noreply","lopez"]     #Second key stored
-            result_2 = @mem_client.set(to_store)
-            expect(result_2.succ).to be true
-            expect(result_2.message).to eq("STORED\r\n")
-            request = ["get","#{result_1.data[1]}","#{result_2.data[2]}"]
+            #First key stored
+            result_1 = @mem_client.set(set_martin)
+            #Second key stored
+            result_2 = @mem_client.set(set_kristen)
+            request = ["get","#{result_1.data[1]}","#{result_2.data[1]}"]
             final_res = @mem_client.get(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
+            expect(final_res.message.split[0] && final_res.message.split[6]).to eq('VALUE')
         end
         it "Get: Multiple keys. One key stored " do
-            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
-            result_1 = @mem_client.set(to_store)
-            expect(result_1.succ).to be true
-            expect(result_1.message).to eq("STORED\r\n")
-            to_store = ["set","martin","2","0","5","noreply","lope"]     #Second key not stored
-            result_2 = @mem_client.set(to_store)
-            expect(result_2.succ).to be false
-            expect(result_2.message).to eq("ERROR\r\n")
-            request = ["get","#{result_1.data[1]}","#{result_2.data[2]}"]
+            #First key stored
+            result_1 = @mem_client.set(set_martin)
+            #Second key not stored
+            result_2 = @mem_client.set(set_john_not)
+            request = ["get","#{result_1.data[1]}","#{result_2.data[1]}"]
             final_res = @mem_client.get(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
+            expect(final_res.message.split.length).to eq(6)
         end
         
         #############################
         ##        Gets-Test        ##
         #############################
 
-        it "Gets: clave 'john' no almacenada" do
-            request = ["gets","john"]
-            result = @mem_client.gets(request)
-            expect(result.succ).to be false
-            expect(result.message).to eq("Not value associated to the key: #{result.data[1]}\r\n")
+        it "Gets: clave 'kristen' no almacenada" do
+            result = @mem_client.gets(gets_1)
+            expect(result.message).to eq(NOT_ASOCIATED + "#{result.data[1]}" + LN_BREAK)
         end
-        it "Gets: key 'john' stored " do
-            to_store = ["set","john","20","300","6","lennon"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
-            request = ["gets","#{result.data[1]}"]
-            final_res = @mem_client.gets(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
-        end  
-        it "Gets: key 'john' stored with nonreply" do
-            to_store = ["set","john","10","0","6","noreply","lennon"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
-            request = ["gets", "#{result.data[1]}"]
-            final_res = @mem_client.gets(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
+        it "Gets: key 'kristen' stored " do
+            result = @mem_client.set(set_kristen)
+            final_res = @mem_client.gets(gets_1)
+            expect(final_res.message.split[5]).to eq(result.data[7])
         end
         it "Gets: Multiple keys stored" do
-            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
-            result_1 = @mem_client.set(to_store)
-            expect(result_1.succ).to be true
-            expect(result_1.message).to eq("STORED\r\n")
-            to_store = ["set","martin","2","0","5","noreply","lopez"]     #Second key stored
-            result_2 = @mem_client.set(to_store)
-            expect(result_2.succ).to be true
-            expect(result_2.message).to eq("STORED\r\n")
+            #First key stored
+            result_1 = @mem_client.set(set_kristen)
+            #Second key stored
+            result_2 = @mem_client.set(set_martin)
             request = ["gets", "#{result_1.data[1]}","#{result_2.data[2]}"]
             final_res = @mem_client.gets(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
+            expect(final_res.message.split[0] && final_res.message.split[0]).to eq('VALUE')
         end
         it "Gets: Multiple keys. One stored" do
-            to_store = ["set","juan","2","0","5","noreply","lopez"]     #First key stored
-            result_1 = @mem_client.set(to_store)
-            expect(result_1.succ).to be true
-            expect(result_1.message).to eq("STORED\r\n")
-            to_store = ["set","martin","2","0","5","noreply","lope"]     #Second key NOT stored
-            result_2 = @mem_client.set(to_store)
-            expect(result_2.succ).to be false
-            expect(result_2.message).to eq("ERROR\r\n")
-            request = ["gets", "#{result_1.data[1]}","#{result_2.data[2]}"]
+            #First key stored
+            result_1 = @mem_client.set(set_martin)
+             #Second key NOT stored
+            result_2 = @mem_client.set(set_john_not)
+            request = ["gets", "#{result_1.data[1]}","#{result_2.data[1]}"]
             final_res = @mem_client.gets(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message.split[0]).to eq("VALUE")
+            expect(final_res.message.split.length).to eq(7)
         end
         #############################
         ##       Append-Test       ##
         #############################
 
-        it "Append: key no existente" do
-            request = ["append","paul","22","150","9","noreply","mccartney"]
-            result = @mem_client.append(request)
-            expect(result.succ).to be false
-            expect(result.message).to eq("NOT_STORED\r\n")
+        it "Append: non-existent key" do
+            result = @mem_client.append(append_kristen)
+            expect(result.message).to eq(NOT_STORED + LN_BREAK)
         end
 
-        it "Append: clave 'paul' almacenada " do
-            to_store = ["set","paul","10","0","9","noreply","mccartney"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
-            request = ["append","#{result.data[1]}","2","430","6","_music"]
-            final_res = @mem_client.append(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message).to eq("STORED\r\n")
+        it "Append: key 'kristen' stored " do
+            result = @mem_client.set(set_kristen)
+            final_res = @mem_client.append(append_kristen)
+            expect(final_res.message).to eq(STORED + LN_BREAK)
         end
         
         #############################
         ##       Prepend-Test      ##
         #############################
 
-        it "Prepend: key no existente" do
-            request = ["prepend","paul","12","10","9","mccartney"]
-            result = @mem_client.prepend(request)
-            expect(result.succ).to be false
-            expect(result.message).to eq("NOT_STORED\r\n")
+        it "Prepend: non-existent key" do
+            result = @mem_client.prepend(prepend_martin)
+            expect(result.message).to eq(NOT_STORED + LN_BREAK)
         end
 
         it "Prepend: clave 'paul' almacenada " do
-            to_store = ["set","paul","10","0","9","mccartney"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
-            request = ["prepend","#{result.data[1]}","2","430","6","_music"]
-            final_res = @mem_client.prepend(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message).to eq("STORED\r\n")
+            result = @mem_client.set(set_martin)
+            final_res = @mem_client.prepend(prepend_martin)
+            expect(final_res.message).to eq(STORED + LN_BREAK)
         end
         #############################
         ##        Add-Test         ##
         #############################
 
-        it "Add: key no existente" do
-            request = ["add","lucas","7","120","5","hello"]
-            result = @mem_client.add(request)
+        it "Add: non-existent key" do
+            result = @mem_client.add(add_kristen)
             expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n")
+            expect(result.message).to eq(STORED + LN_BREAK)
         end
 
-        it "Add: key almacenada previamente" do
-            to_store = ["set","lucas","10","0","9","mccartney"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n") #Set Stored
-            request = ["add","lucas","7","120","5","hello"]
-            final_res = @mem_client.add(request)
-            expect(final_res.succ).to be false
-            expect(final_res.message).to eq("NOT_STORED\r\n") #Add not Stored, key already exists
+        it "Add: key previously stored" do
+            #Key Stored
+            result = @mem_client.set(set_kristen)
+            final_res = @mem_client.add(add_kristen)
+            expect(final_res.message).to eq(NOT_STORED + LN_BREAK)
         end
 
         it "Add: key almacenada previamente, luego expirada" do
-            to_store = ["set","lucas","10","1","9","mccartney"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n") #Set Stored
-            request = ["add","lucas","7","120","5","hello"]
-            final_res = @mem_client.add(request)
-            expect(final_res.succ).to be false
-            expect(final_res.message).to eq("NOT_STORED\r\n") # Add key already exists
+            #Key Stored
+            result = @mem_client.set(set_martin)
+            final_res = @mem_client.add(add_martin)
+            # Add existent key
+            expect(final_res.message).to eq(NOT_STORED + LN_BREAK) 
             sleep(1.1)
-            request = ["add","lucas","7","120","5","hello"]
-            final_res = @mem_client.add(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message).to eq("STORED\r\n") # Key expired, Add Stored
+            # Key expired
+            final_res = @mem_client.add(add_martin)
+            expect(final_res.message).to eq(STORED + LN_BREAK) 
         end
         
         #############################
         ##       Replace-Test      ##
         #############################
 
-        it "Replace: key no existente" do
-            request = ["replace","lucas","7","120","5","hello"]
-            result = @mem_client.replace(request)
-            expect(result.succ).to be false
-            expect(result.message).to eq("NOT_STORED\r\n")
+        it "Replace: non-existent" do
+            result = @mem_client.replace(replace_martin)
+            expect(result.message).to eq(NOT_STORED + LN_BREAK)
         end
 
-        it "Replace: key almacenada previamente" do
-            to_store = ["set","lucas","10","0","9","mccartney"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n") #Set Stored
-            request = ["add","lucas","7","120","5","hello"]
-            final_res = @mem_client.replace(request)
-            expect(final_res.succ).to be true
-            expect(final_res.message).to eq("STORED\r\n") #Replace Stored
+        it "Replace: key previously stored" do
+            result = @mem_client.set(set_martin)
+            final_res = @mem_client.replace(replace_martin)
+            expect(final_res.message).to eq(STORED + LN_BREAK)
         end
 
         #############################
         ##         Cas-Test        ##
         #############################
 
-        it "Cas: key no existente" do
-            request = ["cas","kristen","6","110","5","1","hello"]
-            result = @mem_client.cas(request)
-            expect(result.succ).to be false
-            expect(result.message).to eq("NOT_FOUND\r\n")
+        it "Cas: non-existent" do
+            result = @mem_client.cas(cas_kristen)
+            expect(result.message).to eq(NOT_FOUND + LN_BREAK)
         end
 
-        it "Cas: key existente token NO generado" do
-            to_store = ["set","kristen","10","0","2","hi"]
-            result = @mem_client.set(to_store)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n") #Set Stored
-            request = ["cas","kristen","6","110","5","1","hello"]
-            final_res = @mem_client.cas(request)
-            expect(final_res.succ).to be false
-            expect(final_res.message).to eq("EXISTS\r\n") #Cas, token doesn't exists
+        it "Cas: existent key but without token generated" do
+            #Set Stored
+            result = @mem_client.set(set_kristen)
+            final_res = @mem_client.cas(cas_kristen)
+            #Cas, token doesn't exists
+            expect(final_res.message).to eq(EXISTS + LN_BREAK)
         end
 
         it "Cas: key existente token generado" do
-            to_store_1 = ["set","kristen","10","0","2","hi"]
-            result = @mem_client.set(to_store_1)
-            expect(result.succ).to be true
-            expect(result.message).to eq("STORED\r\n") #Set Stored
-            to_store_2 = ["gets","#{result.data[1]}"]
-            result_1 = @mem_client.gets(to_store_2)
-            expect(result_1.succ).to be true
-            expect(result_1.message.split[0]).to eq("VALUE") #Token generated
-            request = ["cas","kristen","6","110","5","#{result_1.data[5]}","hello"]
-            final_res_1 = @mem_client.cas(request)
-            expect(final_res_1.succ).to be true
-            expect(final_res_1.message).to eq("STORED\r\n") #Cas Stored
+            result = @mem_client.set(set_kristen)
+            result_1 = @mem_client.gets(gets_1)
+            #Token generated
+            final_res_1 = @mem_client.cas(cas_kristen)
+            expect(final_res_1.message).to eq(STORED + LN_BREAK)
         end
      end
 

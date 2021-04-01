@@ -17,6 +17,7 @@ LN_BREAK = "\r\n"
 
 WRONG_PARAMETERS = 'Wrong number of parameters.'
 NOT_ASOCIATED = 'Not value associated to the key: '
+EMPTY = ''
 #COMMAND_NOT_FOUND 'Command not found or supported.'
 
 

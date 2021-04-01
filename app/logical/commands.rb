@@ -191,7 +191,11 @@ class Commands
     def store(data,result)
       @hash_comm[data[1]] = Hash_t.new(data[2],@validations.expectime_correction(data[3]),data[4],data[5],data[6],data[7])
       result.succ = true
-      result.message = STORED
+      if result.noreply
+        result.message = EMPTY
+      else
+        result.message = STORED
+      end
     end
     def update_input_st(data,cas)
       @validations.remove_expired_keys(@hash_comm,data[1])
