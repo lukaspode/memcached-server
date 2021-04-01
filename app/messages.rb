@@ -22,12 +22,27 @@ NOT_ASOCIATED = 'Not value associated to the key: '
 
 # Ver si ponerlo
 HELP_MENU = 
-'
-    * * * * * * * * * * * * * * * * * * * * * * * * *
-    * * * * *    Memcahed Server - Help     * * * * *
-    * * * * * * * * * * * * * * * * * * * * * * * * *
+"
+* * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n
+* * * * *       Memcahed Server - Help       * * * * *\r\n
+* * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n
+    Commands supported\r\n
+        Retrival:   get,gets\r\n
+        Storage:    set,add,replace,append,prepend,cas\r\n
+    Usage\r\n
+        Retrival\r\n
+            get/gets <key>*\r\n
+            * means one or more key strings separated by whitespace.\r\n
+        Storage\r\n
+            <command> <key> <flags> <exptime> <bytes> <cas unique>* [noreply] (*press enter*)\r\n
+            <data block>\r\n
+            *just used in the 'cas' command\r\n
+    Examples\r\n
+        set kristen 2 0 4 (*press enter*)\r\n
+        hola\r\n
+        STORED            (Message expected)\r\n
 
-    Commands supported
-        Retrival:   get,gets
-        Storage:    set,add,replace,append,prepend,cas
-'
+        get kristen\r\n
+        VALUE kristen 2 4\r\n
+        hola              (Message expected)\r\n
+\r\n"

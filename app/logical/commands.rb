@@ -31,7 +31,7 @@ class Commands
           end
         end
         if result.succ == false
-          result.message = NOT_ASOCIATED + data[1]
+          result.message = NOT_ASOCIATED + data[1] + LN_BREAK
         end
       end
       result
@@ -55,7 +55,7 @@ class Commands
           end
         end
         if result.succ == false
-          result.message = NOT_ASOCIATED + data[1]
+          result.message = NOT_ASOCIATED + data[1] + LN_BREAK
         end
       end
       result

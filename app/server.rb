@@ -15,14 +15,16 @@ class Server
     end
         
     def new_client_connection(new_client)
-      new_client.puts "Client connected to localhost: #{@PORT}\r\n"
-      new_client.puts "Waiting for your requests:\r\n"
+      new_client.puts "Successfully connected to localhost : #{@PORT}\r\n"
+      puts "* New client connected. *"
+      new_client.puts 'Waiting for your requests:' + "\r\n"
     end
 
     def client_desconnection(quit_client)
-      quit_client.puts 'Disconnecting from the Server...\r\n'
+      quit_client.puts 'Disconnecting from the Server...' + "\r\n"
       sleep(0.6)
       quit_client.printf 'Client disconnected.'
+      puts 'Client disconnected.'
       sleep(0.9)
       quit_client.close
     end
@@ -72,6 +74,7 @@ class Server
                 # <-------- QUIT ----------->
               when "q"                       
                 client_desconnection(client)
+                break
               else
                 client.puts "ERROR Command not found or supported.\r\n"
                 next
