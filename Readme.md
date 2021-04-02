@@ -120,13 +120,18 @@ hi
 
 ## Tests
 
-To run the tests first we have open a new terminal on ***/test/*** folder and execute the following command:
+To run the tests first we have open a new terminal in the ***/test/*** folder and execute the following command:
 
 ```
 rspec
 ```
 and finally, if everything is working correctly the terminal will display this message: **61 examples, 0 failures**
 
+To test the server through the socket, we run the server same as we did it at first, then we open a terminal in the ***/app/client*** folder and run the following:
+
+```
+ruby client.rb
+```
 ## Version
 
 Version 1.1.0
