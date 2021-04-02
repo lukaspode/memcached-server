@@ -1,4 +1,5 @@
 class Validate
+    
     def is_number?(number)
       true if Integer(number) rescue false 
       #return Integer(number)
@@ -6,29 +7,6 @@ class Validate
     def unsigned_int(number)
       return is_number?(number) && number.to_i>=0        
     end
-
-    # Check amount of commands - STORAGE
-    def check_input_commands_st(data)
-      res1 = data.length == 5
-      res2 = data.length == 6
-      res3 = data.length == 7
-      return res1 || res2 || res3
-    end
-
-    # Check amount of commands - RETRIEVAL
-    def check_input_commands_ret(data)
-      res = data.length >= 2
-      return res
-    end
-
-    # Check amount of commands - CAS
-    def check_input_commands_cas(data)
-      res1 = data.length == 6
-      res2 = data.length == 7
-      res3 = data.length == 8
-      return res1 || res2 || res3
-    end
-
     def key_validator(key)
       return (key.length < 250) ## && (control_character Ver)
     end
@@ -49,7 +27,9 @@ class Validate
       data[6] = (data[6] == "noreply")
       return res
     end
-
+    def generate_token(data,token_stored)
+      token_stored = token_stored + 1
+    end
     # Check match between Bytes and DataBlock
     def msg_byte_validator(data)
       return data[4].to_i  == data[7].length
@@ -118,8 +98,25 @@ class Validate
         end
       end
     end
-
-    def generate_token(data,token_stored)
-      token_stored = token_stored + 1
+    # Check amount of clientinput arguments
+    def check_input_length(data)
+      storage = ['set','add','replace','append','prepend']
+      retrivals = ['get','gets']
+      cas = 'cas'
+      if (storage.include?(data[0]))
+        res1 = data.length == 5
+        res2 = data.length == 6
+        res3 = data.length == 7
+        return res1 || res2 || res3
+      elsif (retrivals.include?(data[0]))
+        res = data.length >= 2
+        return res
+      elsif (data[0] === cas)
+        res1 = data.length == 6
+        res2 = data.length == 7
+        res3 = data.length == 8
+        return res1 || res2 || res3
+      end
     end
+
 end

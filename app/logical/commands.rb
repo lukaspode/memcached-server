@@ -16,13 +16,12 @@ class Commands
     #### ------------------------ #### 
     def get(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_ret(data)
-        data_in = @validations.noreply_correction(data,false)
+      if @validations.check_input_length(data)
         number_keys = data.length
-        result.data = data_in
+        result.data = data
         result.message = ''
         for i in 1..number_keys do
-          @validations.remove_expired_keys(@hash_comm,data_in[i])
+          @validations.remove_expired_keys(@hash_comm,data[i])
           key = data[i]
           if (@hash_comm[key] != nil)
             data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes}\r\n#{@hash_comm[key].msg}\r\nEND\r\n"
@@ -38,17 +37,16 @@ class Commands
     end
     def gets(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_ret(data)
-        data_in = @validations.noreply_correction(data,false)
+      if @validations.check_input_length(data)
         number_keys = data.length
-        result.data = data_in
+        result.data = data
         result.message = ''
         for i in 1..number_keys do
-          @validations.remove_expired_keys(@hash_comm,data_in[i])
+          @validations.remove_expired_keys(@hash_comm,data[i])
           key = data[i]
           if (@hash_comm[key] != nil)
             @hash_comm[key].unique_cas_token =  @validations.generate_token(@hash_comm[key],@token_stored)
-            data_in[5] = @hash_comm[key].unique_cas_token
+            data[5] = @hash_comm[key].unique_cas_token
             data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes} #{@hash_comm[key].unique_cas_token}\r\n#{@hash_comm[key].msg}\r\nEND\r\n"
             result.add_message(data_m)
             result.succ = true
@@ -66,7 +64,7 @@ class Commands
     #### ---------------------- #### 
     def set(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_st(data)
+      if @validations.check_input_length(data)
           data_in = update_input_st(data,false)
           result.data = data_in
           result.message = ERROR
@@ -80,7 +78,7 @@ class Commands
     end
     def add(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_st(data)
+      if @validations.check_input_length(data)
         data_in = update_input_st(data,false)
         result.data = data_in
         result.message = ERROR
@@ -98,7 +96,7 @@ class Commands
     end
     def replace(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_st(data)
+      if @validations.check_input_length(data)
         data_in = update_input_st(data,false)
         result.data = data_in
         result.message = ERROR
@@ -117,7 +115,7 @@ class Commands
     #The append and prepend commands do not accept flags or exptime.They update existing data portions, and ignore new flag and exptime settings.
     def append(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_st(data)
+      if @validations.check_input_length(data)
         data_in = update_input_st(data,false)
         result.data = data_in
         result.message = CLIENT_ERROR
@@ -138,7 +136,7 @@ class Commands
     end
     def prepend(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_st(data)
+      if @validations.check_input_length(data)
         data_in = update_input_st(data,false)
         result.data = data_in
         result.message = CLIENT_ERROR
@@ -158,7 +156,7 @@ class Commands
     end
     def cas(data)
       result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
-      if @validations.check_input_commands_st(data)
+      if @validations.check_input_length(data)
         token = data[5].to_i
         data_in = update_input_st(data,true)
         data_in[5] = token
@@ -184,7 +182,7 @@ class Commands
       HELP_MENU
     end
 
-    private
+    
     #### ---------------------- ####
     ### -- Auxiliar Functions -- ###
     #### ---------------------- #### 

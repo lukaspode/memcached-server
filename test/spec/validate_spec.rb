@@ -79,39 +79,39 @@ require_relative '../../app/messages'
 
             #Set
         it "Storage: Arg length 7, true" do
-          result = @validations.check_input_commands_st(set_true)
+          result = @validations.check_input_length(set_true)
           expect(result).to eq(true)
         end
         it "Storage: Arg length 4, false" do
-          result = @validations.check_input_commands_st(set_false)
+          result = @validations.check_input_length(set_false)
           expect(result).to eq(false)
         end
 
             #Cas
         it "Storage-Cas: Arg length 8, true" do
-          result = @validations.check_input_commands_cas(cas_true)
+          result = @validations.check_input_length(cas_true)
           expect(result).to eq(true)
         end
         it "Storage-Cas: Arg length 8, false" do
-            result = @validations.check_input_commands_cas(cas_false)
+            result = @validations.check_input_length(cas_false)
             expect(result).to eq(false)
         end
 
             #Get-Gets
-        it "Storage-Get: Arg length 2, true" do
-          result = @validations.check_input_commands_ret(get_true)
+        it "Ret-Get: Arg length 2, true" do
+          result = @validations.check_input_length(get_true)
           expect(result).to eq(true)
         end
-        it "Storage-Get: Arg length 1, false" do
-          result = @validations.check_input_commands_ret(get_false)
+        it "Ret-Get: Arg length 1, false" do
+          result = @validations.check_input_length(get_false)
           expect(result).to eq(false)
         end
-        it "Storage-Gets: Arg length 2, true" do
-          result = @validations.check_input_commands_ret(gets_true)
+        it "Ret-Gets: Arg length 2, true" do
+          result = @validations.check_input_length(gets_true)
           expect(result).to eq(true)
         end
-        it "Storage-Gets: Arg length 1, false" do
-          result = @validations.check_input_commands_ret(gets_false)
+        it "Ret-Gets: Arg length 1, false" do
+          result = @validations.check_input_length(gets_false)
           expect(result).to eq(false)
         end
 
