@@ -24,6 +24,7 @@ RSpec.describe Commands do
         subject(:replace_martin) {["replace","martin","32","10","5","steve"]}
         #cas
         subject(:cas_kristen) {["cas", "kristen", "22", "2", "4","1","_bye"]}
+        subject(:cas_martin) {["cas", "martin", "31", "2", "4","2","ciao"]}
         # retrivals
         subject(:get_1) {["get", "martin"]}
         subject(:gets_1) {["gets", "kristen"]}
@@ -227,10 +228,23 @@ RSpec.describe Commands do
             final_res_1 = @mem_client.cas(cas_kristen)
             expect(final_res_1.message).to eq(STORED + LN_BREAK)
         end
-     end
 
         #############################
         ##       Multiple-Test     ##
         #############################
         
-end
+        it "Two keys stored, token generated and then 'cas'" do
+            #First key stored
+            result_1 = @mem_client.set(set_kristen)
+            #Second key stored
+            result_2 = @mem_client.set(set_martin)
+            #token
+            request = ["gets", "#{result_1.data[1]}","#{result_2.data[1]}"]
+            @mem_client.gets(request)
+            #cas
+            final_res_1 = @mem_client.cas(cas_kristen)
+            final_res_2 = @mem_client.cas(cas_martin)
+            expect(final_res_1.message && final_res_2.message).to eq(STORED + LN_BREAK)
+        end
+      end
+    end

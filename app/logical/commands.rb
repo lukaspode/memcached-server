@@ -15,7 +15,7 @@ class Commands
     ###  -- Retrieval Commands --  ###
     #### ------------------------ #### 
     def get(data)
-      result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
+      result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS + LN_BREAK,false)
       if @validations.check_input_length(data)
         number_keys = data.length
         result.data = data
@@ -36,7 +36,7 @@ class Commands
       result
     end
     def gets(data)
-      result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS,false)
+      result = Result.new(false,data,ERROR + ' ' + WRONG_PARAMETERS + LN_BREAK,false)
       if @validations.check_input_length(data)
         number_keys = data.length
         result.data = data
@@ -45,7 +45,8 @@ class Commands
           @validations.remove_expired_keys(@hash_comm,data[i])
           key = data[i]
           if (@hash_comm[key] != nil)
-            @hash_comm[key].unique_cas_token =  @validations.generate_token(@hash_comm[key],@token_stored)
+            @token_stored = @validations.generate_token(@hash_comm[key],@token_stored)
+            @hash_comm[key].unique_cas_token =  @token_stored
             data[5] = @hash_comm[key].unique_cas_token
             data_m = "VALUE #{key} #{@hash_comm[key].flag} #{@hash_comm[key].bytes} #{@hash_comm[key].unique_cas_token}\r\n#{@hash_comm[key].msg}\r\nEND\r\n"
             result.add_message(data_m)
