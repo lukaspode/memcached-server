@@ -120,12 +120,12 @@ hi
 
 ## Tests
 
-To run the tests first we have to run the server as we did it at first, then we open a new terminal on ***/test/spec*** folder and execute the following command:
+To run the tests first we have open a new terminal on ***/test/*** folder and execute the following command:
 
 ```
-rspec test_commands.rb
+rspec
 ```
-and finally, if everything is working correctly the terminal would display this message: **27 examples, 0 failures**
+and finally, if everything is working correctly the terminal would display this message: **61 examples, 0 failures**
 
 ## Version
 
