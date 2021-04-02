@@ -32,7 +32,7 @@ ruby server.rb
 ```
 *you will get the following message* : **Server running on port: 3000**
 
-![Server running](/img_rdm/server_running.jpg)
+![Server running](/images/server_running.jpg)
 
 #### New client connection
 
@@ -43,9 +43,9 @@ telnet localhost 3000
 ```
 - If we want to connect more than one client, we make the same procedure: open a new console dialog and run **telnet localhost 3000** again.
 
-![Client connection](/img_rdm/client_connection.jpg)
+![Client connection](/images/client_connection.jpg)
 
-![Client connected](/img_rdm/client_ok.jpg)
+![Client connected](/images/client_ok.jpg)
 
 ## Supported commands
 
@@ -114,9 +114,9 @@ hi
 
 #### Client input on console
 
-![Set example](/img_rdm/set.jpg)
-![Append,repend](/img_rdm/set_append_get.jpg)
-![Add, replace, cas](/img_rdm/cas_gets.jpg)
+![Set example](/images/set.jpg)
+![Append,repend](/images/set_append_get.jpg)
+![Add, replace, cas](/images/cas_gets.jpg)
 
 ## Tests
 
@@ -125,7 +125,7 @@ To run the tests first we have open a new terminal on ***/test/*** folder and ex
 ```
 rspec
 ```
-and finally, if everything is working correctly the terminal would display this message: **61 examples, 0 failures**
+and finally, if everything is working correctly the terminal will display this message: **61 examples, 0 failures**
 
 ## Version
 
