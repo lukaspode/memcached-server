@@ -39,10 +39,10 @@ class Validate
       return is_number?(data)
     end
     def bytes_validator(bytes)
-      return (bytes.length <= 8) && (is_number?(bytes))
+      return (bytes.to_i <= 256) && (is_number?(bytes))
     end
     def datablock_validator(data)
-      return (data.length <= 8)
+      return (data.length <= 256)
     end
     def noreply_validator(data)
       res = (data[6] == "noreply" || data[6] == "")
