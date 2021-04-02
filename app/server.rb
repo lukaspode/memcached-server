@@ -34,55 +34,55 @@ class Server
       loop do
         Thread.start(@server.accept) do |client|
           new_client_connection(client)
-            while console_input = client.gets
-              request = console_input.split[0]
-              user_input = console_input.split
-              case request
-                # <----- Retrieval commands ------>
-              when "get"
-                answer = @client_petitions.get(user_input)
-              when "gets"
-                answer = @client_petitions.gets(user_input)
-                # <------ Storage commands ------->
-              when "set"
-                data_block = client.gets( "\r\n" ).chomp( "\r\n" )
-                user_input.push(data_block)
-                answer = @client_petitions.set(user_input)
-              when "add"
-                data_block = client.gets( "\r\n" ).chomp( "\r\n" )
-                user_input.push(data_block)
-                answer = @client_petitions.add(user_input)
-              when "replace"
-                data_block = client.gets( "\r\n" ).chomp( "\r\n" )
-                user_input.push(data_block)
-                answer = @client_petitions.replace(user_input)
-              when "append"
-                data_block = client.gets( "\r\n" ).chomp( "\r\n" )
-                user_input.push(data_block)
-                answer = @client_petitions.append(user_input)
-              when "prepend"
-                data_block = client.gets( "\r\n" ).chomp( "\r\n" )
-                user_input.push(data_block)
-                answer = @client_petitions.prepend(user_input)
-              when "cas"
-                data_block = client.gets( "\r\n" ).chomp( "\r\n" )
-                user_input.push(data_block)
-                answer = @client_petitions.cas(user_input)
-              when "help"                       
-                client.puts "#{@client_petitions.help()}"
-                next
-                # <-------- QUIT ----------->
-              when "q"                       
-                client_disconnection(client)
-                break
-              else
-                client.puts "ERROR Command not found or supported.\r\n"
-                next
-              end
-              if(!answer.noreply)
-                client.puts "#{answer.message}"
-              end
+          while console_input = client.gets
+            request = console_input.split[0]
+            user_input = console_input.split
+            case request
+              # <----- Retrieval commands ------>
+            when "get"
+              answer = @client_petitions.get(user_input)
+            when "gets"
+              answer = @client_petitions.gets(user_input)
+              # <------ Storage commands ------->
+            when "set"
+              data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+              user_input.push(data_block)
+              answer = @client_petitions.set(user_input)
+            when "add"
+              data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+              user_input.push(data_block)
+              answer = @client_petitions.add(user_input)
+            when "replace"
+              data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+              user_input.push(data_block)
+              answer = @client_petitions.replace(user_input)
+            when "append"
+              data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+              user_input.push(data_block)
+              answer = @client_petitions.append(user_input)
+            when "prepend"
+              data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+              user_input.push(data_block)
+              answer = @client_petitions.prepend(user_input)
+            when "cas"
+              data_block = client.gets( "\r\n" ).chomp( "\r\n" )
+              user_input.push(data_block)
+              answer = @client_petitions.cas(user_input)
+            when "help"                       
+              client.puts "#{@client_petitions.help()}"
+              next
+              # <-------- QUIT ----------->
+            when "q"                       
+              client_disconnection(client)
+              break
+            else
+              client.puts "ERROR Command not found or supported.\r\n"
+              next
             end
+            if(!answer.noreply)
+              client.puts "#{answer.message}"
+            end
+          end
         end
       end
     end
